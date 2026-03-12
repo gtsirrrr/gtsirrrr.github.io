@@ -1,0 +1,4 @@
+baseURL = 'https://gtisrrrr.github.io/'
+languageCode = 'zh-cn'
+title = '裴峙丞的个人主页'
+theme = 'PaperMod'

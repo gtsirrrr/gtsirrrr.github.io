@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>裴峙丞的个人主页</title>
+    <title>Jake Pei|裴峙丞的个人主页</title>
     <link>http://localhost:1313/</link>
-    <description>Recent content on 裴峙丞的个人主页</description>
+    <description>Recent content on Jake Pei|裴峙丞的个人主页</description>
     <generator>Hugo</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 12 Mar 2026 22:35:39 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 13 Mar 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>💻 个人作品展 | Music × AI</title>
+      <link>http://localhost:1313/posts/portfolio/</link>
+      <pubDate>Fri, 13 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/portfolio/</guid>
+      <description>&lt;p&gt;欢迎来到我的作品展！这里记录了我将音乐理论、数据科学与机器学习相结合的探索与实践。以下是我近期独立开发的一些交互式 Web 应用：&lt;/p&gt;
+&lt;h3 id=&#34;1-爆款流行音乐预测&#34;&gt;1. 爆款流行音乐预测&lt;/h3&gt;
+&lt;p&gt;🔗 &lt;strong&gt;&lt;a href=&#34;https://musicsongpredictor-gtsirrrr.streamlit.app/&#34;&gt;点击体验 App&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;一首歌具备怎样的特质才能在市场上大受欢迎？这个基于机器学习的项目对流行音乐的声学特征、时长等核心指标进行了深度建模。&lt;/p&gt;
+&lt;h3 id=&#34;2-画旋律-notedrawing&#34;&gt;2. 画旋律 (NoteDrawing)&lt;/h3&gt;
+&lt;p&gt;🔗 &lt;strong&gt;&lt;a href=&#34;https://musicnotedrawing-qh2hgsujsv5wtmyj59kydj.streamlit.app/&#34;&gt;点击体验 App&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这是一个将视觉涂鸦转化为听觉艺术的互动项目。只要你在五线谱上随性画出线条，系统就能自动生成带有丰富和声的完整旋律，让音乐创作变得像画画一样直观、充满随机的惊喜。&lt;/p&gt;
+&lt;h3 id=&#34;3-调式-ai-分析-songpredictor&#34;&gt;3. 调式 AI 分析 (SongPredictor)&lt;/h3&gt;
+&lt;p&gt;🔗 &lt;strong&gt;&lt;a href=&#34;https://gtsirrrr-musicmoderecognizer-grfxrrpxvv7tkzuopcf2zr.streamlit.app/&#34;&gt;点击体验 App&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;结合数据分析，这个轻量级的在线工具可以智能识别并分析音频的调式特征，将抽象的乐理属性转化为可视化的结果，帮助创作者更快速地扒带与解构音乐。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;所有应用均使用 Python 与 Streamlit 框架构建。未来这里还会展出更多好玩的东西！&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
     <item>
       <title>gtsirrrr向您问好！</title>
       <link>http://localhost:1313/posts/hello-world/</link>

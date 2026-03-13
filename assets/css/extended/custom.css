@@ -1,0 +1,68 @@
+/* ==========================================================
+   gtsirrrr 个人主页美术增强脚本 v6.0 (全屏散落·多层倍速版)
+   ========================================================== */
+
+/* 1. 把长长的云朵代码装进变量，保持代码清爽 */
+:root {
+    --cloud-svg: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTQ0LDQwIEwyMCw0MCBDMTQuNDc3LDQwIDEwLDM1LjUyMyAxMCwzMCBDMTAsMjQuNDc3IDE0LjQ3NywyMCAyMCwyMCBDMjAuOTE1LDIwIDIxLjgwMiwyMC4xMjYgMjIuNjQ2LDIwLjM2IEMyNC40ODQsMTUuNTQ5IDI5LjE1NSwxMiAzNC41LDEyIEM0MS40MDQsMTIgNDcsMTcuNTk2IDQ3LDI0LjUgQzQ3LDI1LjA0NSA0Ni45NjUsMjUuNTgxIDQ2Ljg5NiwyNi4xMDcgQzUwLjkxNiwyNy4wMjQgNTQsMzAuNjM1IDU0LDM1IEM1NCw0MC41MjMgNDkuNTIzLDQwIDQ0LDQwIFoiLz48L3N2Zz4=");
+    --theme: #f0f8ff; 
+    --entry: rgba(255, 255, 255, 0.55); 
+}
+
+/* 2. 背景与图层保护 */
+html { background-color: #f0f8ff !important; }
+body { background-color: transparent !important; }
+.main { position: relative; z-index: 10 !important; }
+.profile_inner { background-color: transparent !important; }
+
+/* 3. 释放 4 个图层：同时使用 html 和 body 的 before/after 伪元素 */
+html::before, html::after, body::before, body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    background-repeat: repeat-x;
+    z-index: -1;
+    background-image: var(--cloud-svg);
+    filter: blur(1.5px);
+}
+
+/* --- 图层 1：高空，小云，速度较快 --- */
+html::before {
+    top: 2%; /* Y轴：最高点 */
+    background-size: 200px auto; 
+    opacity: 0.3;         
+    animation: c1 18s linear infinite; 
+}
+
+/* --- 图层 2：中高空，中大云，速度极快 --- */
+html::after {
+    top: 15%; /* Y轴：错开 13% */
+    background-size: 380px auto; 
+    opacity: 0.7;         
+    animation: c2 10s linear infinite; /* 大幅提速！ */
+}
+
+/* --- 图层 3：中低空，中云，速度中等 --- */
+body::before {
+    top: 38%; /* Y轴：穿插在作品集后方 */
+    background-size: 280px auto; 
+    opacity: 0.5;         
+    animation: c3 14s linear infinite; 
+}
+
+/* --- 图层 4：低空（前景），巨云，速度最快 --- */
+body::after {
+    top: 70%; /* Y轴：最低点 */
+    background-size: 550px auto; 
+    opacity: 0.85;         
+    animation: c4 7s linear infinite; /* 极速飘过，增加空间穿透感 */
+}
+
+/* 4. 动画轨迹：每个图层精准移动自己宽度的距离，实现完美无缝衔接 */
+@keyframes c1 { 0% { background-position: 0 0; } 100% { background-position: -200px 0; } }
+@keyframes c2 { 0% { background-position: 0 0; } 100% { background-position: -380px 0; } }
+@keyframes c3 { 0% { background-position: 0 0; } 100% { background-position: -280px 0; } }
+@keyframes c4 { 0% { background-position: 0 0; } 100% { background-position: -550px 0; } }

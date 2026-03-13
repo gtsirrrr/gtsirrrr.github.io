@@ -1,4 +1,23 @@
-baseURL = 'https://gtisrrrr.github.io/'
+baseURL = 'https://gtsirrrr.github.io/'
 languageCode = 'zh-cn'
-title = '裴峙丞的个人主页'
+title = 'Jake Pei|裴峙丞的个人主页'
 theme = 'PaperMod'
+
+[params.profileMode]
+enabled = true
+title = "Hi, 我是 裴峙丞 👋"
+subtitle = "用代码解析和弦，令算法谱写旋律。 | Music × Data × Machine Learning"
+imageWidth = 120
+imageHeight = 120
+
+[[menu.main]]
+identifier = "home"
+name = "🏠 首页"
+url = "/"
+weight = 5  # 数字越小，按钮排得越靠前
+
+[[menu.main]]
+identifier = "portfolio"
+name = "✨ 作品集"
+url = "/posts/portfolio/"
+weight = 10

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#faf9f8">
+  <title>大不了宇宙 — Jake Pei</title>
+  <style>
+    :root {
+      --microscope-white: #faf9f8;
+      --ink: #101310;
+      --green-ink: #2f5f35;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--microscope-white);
+    }
+
+    body {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .universe-frame {
+      position: relative;
+      width: 100vw;
+      height: 100svh;
+      overflow: hidden;
+      background: var(--microscope-white);
+      isolation: isolate;
+      container-type: size;
+      animation: microscope-focus 3.35s cubic-bezier(0.18, 0.74, 0.2, 1)
+        both;
+    }
+
+    .universe-frame.is-focused {
+      animation: none;
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+
+    .visual-layer {
+      position: absolute;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .paper-field {
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .microscope-atmosphere {
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      opacity: 0.86;
+      filter: saturate(0.72) contrast(1.02);
+    }
+
+    .cell-stage {
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 1;
+      width: 109.3573cqh;
+      height: 100%;
+      pointer-events: auto;
+      filter: saturate(0.76) contrast(1.06) brightness(0.99);
+    }
+
+    .cell-source,
+    .cell-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .cell-source {
+      display: block;
+      object-fit: fill;
+      transition: opacity 220ms ease;
+    }
+
+    .cell-canvas {
+      display: block;
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .cell-stage.is-fluid-ready .cell-source {
+      opacity: 0;
+    }
+
+    .cell-stage.is-fluid-ready .cell-canvas {
+      opacity: 1;
+    }
+
+    .album-kicker {
+      position: absolute;
+      left: 6cqw;
+      top: 8.2%;
+      z-index: 5;
+      color: var(--ink);
+      font-family:
+        "Times New Roman",
+        "Noto Serif SC",
+        serif;
+      font-size: clamp(10px, 1.42cqh, 19px);
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .album-title {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .track-copy {
+      position: absolute;
+      left: 16.2cqw;
+      top: 18.4%;
+      z-index: 6;
+      width: 25.2cqw;
+      color: var(--ink);
+      font-family:
+        "Songti SC",
+        "STSong",
+        "SimSun",
+        serif;
+      font-size: clamp(14.5px, 2.12cqh, 25px);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      line-height: 1.15;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .track-copy.is-visible {
+      opacity: 1;
+    }
+
+    .copy-line {
+      display: block;
+      min-height: 1.3em;
+      margin-bottom: clamp(26px, 4.6cqh, 46px);
+      white-space: nowrap;
+      opacity: 0.5;
+      filter: blur(9px);
+      transform: translate3d(-7px, 0, 0);
+    }
+
+    .copy-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .track-copy.is-visible .copy-line {
+      animation: copy-line-resolve 1.08s
+        cubic-bezier(0.2, 0.76, 0.2, 1) var(--line-delay) both;
+    }
+
+    .copy-char {
+      display: inline-block;
+      transform-origin: 50% 58%;
+      animation: copy-char-float var(--char-duration)
+        ease-in-out var(--char-delay) infinite alternate;
+      will-change: transform;
+    }
+
+    .copy-char--accent {
+      color: var(--ink);
+      font-size: 1.48em;
+      line-height: 0.72;
+      vertical-align: -0.08em;
+      animation:
+        copy-char-float var(--char-duration)
+          ease-in-out var(--char-delay) infinite alternate,
+        copy-accent-color 620ms ease var(--accent-delay) forwards;
+    }
+
+    .title-glyph {
+      position: absolute;
+      display: block;
+      object-fit: fill;
+      transform-origin: 50% 50%;
+      filter: saturate(0.94) contrast(1.03);
+      animation-duration: var(--float-duration);
+      animation-delay: var(--float-delay);
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+    }
+
+    .glyph-da {
+      left: 2.7cqw;
+      top: 11.909263%;
+      width: 15.4064cqh;
+      height: 12.854442%;
+      --float-duration: 6.8s;
+      --float-delay: -1.4s;
+      animation-name: glyph-float-a;
+    }
+
+    .glyph-bu {
+      left: 2.5cqw;
+      top: 23.629490%;
+      width: 15.6899cqh;
+      height: 12.098299%;
+      --float-duration: 7.6s;
+      --float-delay: -4.1s;
+      animation-name: glyph-float-b;
+    }
+
+    .glyph-liao {
+      left: 2.3cqw;
+      top: 34.310019%;
+      width: 15.9735cqh;
+      height: 12.665406%;
+      --float-duration: 6.2s;
+      --float-delay: -2.8s;
+      animation-name: glyph-float-c;
+    }
+
+    .glyph-yu {
+      left: 2.1cqw;
+      top: 45.557656%;
+      width: 16.5406cqh;
+      height: 13.043478%;
+      --float-duration: 8.1s;
+      --float-delay: -5.5s;
+      animation-name: glyph-float-d;
+    }
+
+    .glyph-zhou {
+      left: 1.9cqw;
+      top: 56.994329%;
+      width: 17.5803cqh;
+      height: 12.759924%;
+      --float-duration: 7.1s;
+      --float-delay: -3.2s;
+      animation-name: glyph-float-e;
+    }
+
+    .track-point {
+      position: absolute;
+      z-index: 3;
+      width: max(38px, 5.3cqh);
+      height: max(38px, 5.3cqh);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      transform: translate3d(
+        calc(-50% + var(--flow-x, 0px)),
+        calc(-50% + var(--flow-y, 0px)),
+        0
+      );
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .marker-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      color: var(--ink);
+      font-family:
+        "Times New Roman",
+        "Noto Serif SC",
+        serif;
+      font-size: clamp(11px, 1.82cqh, 23px);
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      white-space: nowrap;
+      transform: translate3d(
+        calc(-50% + var(--label-x)),
+        calc(-50% + var(--label-y)),
+        0
+      ) scale3d(1.5, 1, 1);
+      transition:
+        color 220ms ease,
+        transform 260ms ease;
+      pointer-events: none;
+    }
+
+    .track-point:hover .marker-label,
+    .track-point:focus-visible .marker-label,
+    .track-point[aria-pressed="true"] .marker-label {
+      color: var(--green-ink);
+      transform: translate3d(
+        calc(-50% + var(--label-x)),
+        calc(-50% + var(--label-y)),
+        0
+      ) scale3d(1.65, 1.1, 1);
+    }
+
+    .track-point:focus-visible {
+      outline: 1px solid rgba(47, 95, 53, 0.6);
+      outline-offset: 2px;
+      border-radius: 50%;
+    }
+
+    .marker-01 {
+      left: 31.4%;
+      top: 15.1%;
+      --label-x: -5.95cqh;
+      --label-y: 0.76cqh;
+    }
+
+    .marker-02 {
+      left: 75.7%;
+      top: 17%;
+      --label-x: 2.2cqh;
+      --label-y: 2.36cqh;
+    }
+
+    .marker-03 {
+      left: 92.2%;
+      top: 52.4%;
+      --label-x: 3cqh;
+      --label-y: 1.3cqh;
+    }
+
+    .marker-04 {
+      left: 68.4%;
+      top: 92.9%;
+      --label-x: 3.4cqh;
+      --label-y: 0cqh;
+    }
+
+    .marker-05 {
+      left: 28.7%;
+      top: 91.7%;
+      --label-x: -3.1cqh;
+      --label-y: 2.8cqh;
+    }
+
+    .marker-06 {
+      left: 8.5%;
+      top: 52.9%;
+      --label-x: -4.8cqh;
+      --label-y: 1.6cqh;
+    }
+
+    @keyframes microscope-focus {
+      0% {
+        opacity: 0.34;
+        filter: blur(34px) brightness(1.14) contrast(0.56);
+        transform: scale(1.055);
+      }
+      28% {
+        opacity: 0.62;
+        filter: blur(21px) brightness(1.1) contrast(0.66);
+        transform: scale(1.035);
+      }
+      58% {
+        opacity: 0.86;
+        filter: blur(9px) brightness(1.05) contrast(0.82);
+        transform: scale(1.017);
+      }
+      82% {
+        opacity: 0.97;
+        filter: blur(2.5px) brightness(1.015) contrast(0.95);
+        transform: scale(1.004);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0) brightness(1) contrast(1);
+        transform: scale(1);
+      }
+    }
+
+    @keyframes glyph-float-a {
+      0% { transform: translate3d(-2px, 2px, 0) rotate(-0.38deg); }
+      45% { transform: translate3d(3px, -6px, 0) rotate(0.52deg); }
+      100% { transform: translate3d(-3px, 5px, 0) rotate(-0.15deg); }
+    }
+
+    @keyframes glyph-float-b {
+      0% { transform: translate3d(3px, -3px, 0) rotate(0.3deg); }
+      52% { transform: translate3d(-5px, 6px, 0) rotate(-0.48deg); }
+      100% { transform: translate3d(3px, 2px, 0) rotate(0.22deg); }
+    }
+
+    @keyframes glyph-float-c {
+      0% { transform: translate3d(-3px, -2px, 0) rotate(-0.22deg); }
+      38% { transform: translate3d(5px, 5px, 0) rotate(0.42deg); }
+      100% { transform: translate3d(0, -6px, 0) rotate(-0.3deg); }
+    }
+
+    @keyframes glyph-float-d {
+      0% { transform: translate3d(2px, 5px, 0) rotate(0.27deg); }
+      55% { transform: translate3d(-3px, -6px, 0) rotate(-0.38deg); }
+      100% { transform: translate3d(5px, 2px, 0) rotate(0.45deg); }
+    }
+
+    @keyframes glyph-float-e {
+      0% { transform: translate3d(-3px, 3px, 0) rotate(-0.3deg); }
+      42% { transform: translate3d(5px, -5px, 0) rotate(0.38deg); }
+      100% { transform: translate3d(-2px, 6px, 0) rotate(-0.18deg); }
+    }
+
+    @keyframes copy-line-resolve {
+      0% {
+        opacity: 0.5;
+        filter: blur(9px);
+        transform: translate3d(-7px, 0, 0);
+      }
+      58% {
+        opacity: 0.72;
+        filter: blur(3.5px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    @keyframes copy-char-float {
+      0% {
+        transform: translate3d(
+          var(--char-x-from),
+          var(--char-y-from),
+          0
+        ) rotate(var(--char-r-from));
+      }
+      48% {
+        transform: translate3d(
+          var(--char-x-mid),
+          var(--char-y-mid),
+          0
+        ) rotate(var(--char-r-mid));
+      }
+      100% {
+        transform: translate3d(
+          var(--char-x-to),
+          var(--char-y-to),
+          0
+        ) rotate(var(--char-r-to));
+      }
+    }
+
+    @keyframes copy-accent-color {
+      0% { color: var(--ink); }
+      100% { color: #218d82; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .universe-frame {
+        animation: none;
+      }
+
+      .title-glyph,
+      .copy-char {
+        animation: none;
+      }
+
+      .track-copy.is-visible .copy-line {
+        animation-duration: 1ms;
+        animation-delay: 0ms;
+      }
+
+      .copy-char--accent {
+        color: #218d82;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="universe-frame" aria-label="专辑《大不了宇宙》">
+    <img
+      class="visual-layer paper-field"
+      src="/images/universe/static-layers/paper-background.png"
+      alt=""
+    >
+    <div class="cell-stage" aria-label="曲目节点">
+      <img
+        class="visual-layer microscope-atmosphere"
+        src="/images/universe/static-layers/microscope-atmosphere.png"
+        alt=""
+      >
+      <img
+        class="cell-source"
+        src="/images/universe/static-layers/cell.png"
+        alt=""
+      >
+      <canvas class="cell-canvas"></canvas>
+
+      <button class="track-point marker-01" type="button" data-u="0.314" data-v="0.151" data-track="01" aria-label="查看曲目 01" aria-pressed="false">
+        <span class="marker-label">01</span>
+      </button>
+      <button class="track-point marker-02" type="button" data-u="0.757" data-v="0.170" data-track="02" aria-label="查看曲目 02" aria-pressed="false">
+        <span class="marker-label">02</span>
+      </button>
+      <button class="track-point marker-03" type="button" data-u="0.922" data-v="0.524" data-track="03" aria-label="查看曲目 03" aria-pressed="false">
+        <span class="marker-label">03</span>
+      </button>
+      <button class="track-point marker-04" type="button" data-u="0.684" data-v="0.929" data-track="04" aria-label="查看曲目 04" aria-pressed="false">
+        <span class="marker-label">04</span>
+      </button>
+      <button class="track-point marker-05" type="button" data-u="0.287" data-v="0.917" data-track="05" aria-label="查看曲目 05" aria-pressed="false">
+        <span class="marker-label">05</span>
+      </button>
+      <button class="track-point marker-06" type="button" data-u="0.085" data-v="0.529" data-track="06" aria-label="查看曲目 06" aria-pressed="false">
+        <span class="marker-label">06</span>
+      </button>
+    </div>
+
+    <p class="album-kicker">ALBUM II</p>
+
+    <section
+      class="track-copy"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></section>
+
+    <h1 class="album-title" aria-label="大不了宇宙">
+      <img class="title-glyph glyph-da" src="/images/universe/static-layers/glyph-da.png" alt="">
+      <img class="title-glyph glyph-bu" src="/images/universe/static-layers/glyph-bu.png" alt="">
+      <img class="title-glyph glyph-liao" src="/images/universe/static-layers/glyph-liao.png" alt="">
+      <img class="title-glyph glyph-yu" src="/images/universe/static-layers/glyph-yu.png" alt="">
+      <img class="title-glyph glyph-zhou" src="/images/universe/static-layers/glyph-zhou.png" alt="">
+    </h1>
+
+  </main>
+
+  <script>
+    (() => {
+      const frame = document.querySelector(".universe-frame")
+      const stage = document.querySelector(".cell-stage")
+      const source = stage?.querySelector(".cell-source")
+      const canvas = stage?.querySelector(".cell-canvas")
+      const markers = [...document.querySelectorAll(".track-point")]
+      const copyRegion = document.querySelector(".track-copy")
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches
+
+      if (!frame || !stage || !source || !canvas) return
+
+      const finishFocus = () => {
+        frame.classList.add("is-focused")
+      }
+      frame.addEventListener("animationend", finishFocus, { once: true })
+      window.setTimeout(finishFocus, 3600)
+      if (reducedMotion) finishFocus()
+
+      const trackCopy = {
+        "01": [
+          "芙蕾雅小姐轻轻地躺在",
+          "一团简单而幼稚的结构里",
+          "她只不过是个细胞",
+          "却独享着同样浪漫的",
+          "（平面银河）",
+        ],
+        "02": [
+          "出身寂灭的荒芜",
+          "苦寻遗失的繁荣",
+          "他是无乡的旅客",
+          "其名为：",
+          "（异世纪人）",
+        ],
+        "03": [
+          "生态卵内",
+          "我们正策划一场（木质）之（雨）",
+          "它会下成一首呛人的欢歌",
+          "它会下出一场粗糙的梦",
+        ],
+        "04": [
+          "来自遥远之星的朋友：",
+          "我们是不那么无私的星际居民",
+          "但我们会发出纯粹的声音",
+          "那是用频率排列成的",
+          "歌喉的（致辞）",
+        ],
+        "05": ["待续……"],
+        "06": ["待续……"],
+      }
+
+      const visibleText = (line) => line.replace(/[（）]/g, "")
+
+      const appendCharacters = (
+        lineElement,
+        text,
+        emphasized,
+        lineIndex,
+        offset
+      ) => {
+        ;[...text].forEach((character, characterIndex) => {
+          const seed = lineIndex * 17 + offset + characterIndex
+          const span = document.createElement("span")
+          span.className = emphasized
+            ? "copy-char copy-char--accent"
+            : "copy-char"
+          span.textContent = character
+          span.setAttribute("aria-hidden", "true")
+          span.style.setProperty(
+            "--char-duration",
+            `${4.4 + (seed % 7) * 0.42}s`
+          )
+          span.style.setProperty(
+            "--char-delay",
+            `${-((seed % 11) * 0.37)}s`
+          )
+          const x = 1.1 + (seed % 4) * 0.42
+          const y = 0.9 + ((seed * 3) % 5) * 0.34
+          const rotation = 0.16 + ((seed * 5) % 6) * 0.055
+          span.style.setProperty("--char-x-from", `${x * -0.55}px`)
+          span.style.setProperty("--char-y-from", `${y * -0.7}px`)
+          span.style.setProperty("--char-r-from", `${rotation * -0.65}deg`)
+          span.style.setProperty("--char-x-mid", `${x * 0.45}px`)
+          span.style.setProperty("--char-y-mid", `${y}px`)
+          span.style.setProperty("--char-r-mid", `${rotation}deg`)
+          span.style.setProperty("--char-x-to", `${x}px`)
+          span.style.setProperty("--char-y-to", `${y * -0.35}px`)
+          span.style.setProperty("--char-r-to", `${rotation * -0.3}deg`)
+          if (emphasized) {
+            span.style.setProperty(
+              "--accent-delay",
+              `${lineIndex * 2 + 2.8}s`
+            )
+          }
+          lineElement.appendChild(span)
+        })
+        return offset + [...text].length
+      }
+
+      const renderTrackCopy = (track) => {
+        if (!copyRegion) return
+        const lines = trackCopy[track]
+        if (!lines) return
+
+        copyRegion.classList.remove("is-visible")
+        copyRegion.replaceChildren()
+        copyRegion.dataset.track = track
+        copyRegion.setAttribute(
+          "aria-label",
+          lines.map(visibleText).join("。")
+        )
+
+        lines.forEach((line, lineIndex) => {
+          const lineElement = document.createElement("span")
+          lineElement.className = "copy-line"
+          lineElement.style.setProperty(
+            "--line-delay",
+            `${lineIndex * 2 + 0.72}s`
+          )
+
+          let cursor = 0
+          let characterOffset = 0
+          const emphasisPattern = /（([^）]+)）/g
+          let match
+
+          while ((match = emphasisPattern.exec(line))) {
+            characterOffset = appendCharacters(
+              lineElement,
+              line.slice(cursor, match.index),
+              false,
+              lineIndex,
+              characterOffset
+            )
+            characterOffset = appendCharacters(
+              lineElement,
+              match[1],
+              true,
+              lineIndex,
+              characterOffset
+            )
+            cursor = match.index + match[0].length
+          }
+
+          appendCharacters(
+            lineElement,
+            line.slice(cursor),
+            false,
+            lineIndex,
+            characterOffset
+          )
+          copyRegion.appendChild(lineElement)
+        })
+
+        requestAnimationFrame(() => {
+          copyRegion.classList.add("is-visible")
+        })
+      }
+
+      markers.forEach((marker) => {
+        marker.addEventListener("click", () => {
+          markers.forEach((candidate) => {
+            candidate.setAttribute("aria-pressed", "false")
+          })
+          marker.setAttribute("aria-pressed", "true")
+          stage.dataset.activeTrack = marker.dataset.track
+          renderTrackCopy(marker.dataset.track)
+        })
+      })
+
+      const setup = () => {
+        const gl = canvas.getContext("webgl", {
+          alpha: true,
+          antialias: true,
+          premultipliedAlpha: true,
+        })
+        if (!gl) return
+
+        const vertexSource = `
+          attribute vec2 a_position;
+          varying vec2 v_uv;
+
+          void main() {
+            v_uv = a_position * 0.5 + 0.5;
+            gl_Position = vec4(a_position, 0.0, 1.0);
+          }
+        `
+
+        const fragmentSource = `
+          precision highp float;
+
+          varying vec2 v_uv;
+          uniform sampler2D u_texture;
+          uniform float u_time;
+
+          vec2 organicDisplacement(vec2 uv, float time) {
+            float horizontal =
+              sin(uv.y * 9.2 + time * 0.34) * 0.0032 +
+              sin((uv.x + uv.y) * 17.0 - time * 0.21) * 0.0017 +
+              cos(uv.y * 25.0 + time * 0.16) * 0.0009;
+            float vertical =
+              cos(uv.x * 8.4 - time * 0.29) * 0.0027 +
+              sin((uv.x * 1.4 - uv.y) * 15.0 + time * 0.23) * 0.0015 +
+              sin(uv.x * 23.0 - time * 0.13) * 0.0008;
+            float breathing =
+              sin(time * 0.28 + uv.x * 4.0 + uv.y * 3.0) * 0.0012;
+            return vec2(horizontal + breathing, vertical - breathing) * 1.35;
+          }
+
+          void main() {
+            vec2 displacement = organicDisplacement(v_uv, u_time);
+            vec2 sampleUv = clamp(
+              v_uv + displacement,
+              vec2(0.001),
+              vec2(0.999)
+            );
+            vec4 color = texture2D(u_texture, sampleUv);
+            float livingLight =
+              1.0 + 0.024 *
+              sin(u_time * 0.31 + v_uv.x * 7.0 - v_uv.y * 5.0);
+            color.rgb *= livingLight;
+            gl_FragColor = color;
+          }
+        `
+
+        const compile = (type, shaderSource) => {
+          const shader = gl.createShader(type)
+          gl.shaderSource(shader, shaderSource)
+          gl.compileShader(shader)
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            gl.deleteShader(shader)
+            return null
+          }
+          return shader
+        }
+
+        const vertex = compile(gl.VERTEX_SHADER, vertexSource)
+        const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource)
+        if (!vertex || !fragment) return
+
+        const program = gl.createProgram()
+        gl.attachShader(program, vertex)
+        gl.attachShader(program, fragment)
+        gl.linkProgram(program)
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return
+
+        const buffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array([
+            -1, -1,
+             1, -1,
+            -1,  1,
+            -1,  1,
+             1, -1,
+             1,  1,
+          ]),
+          gl.STATIC_DRAW
+        )
+
+        gl.useProgram(program)
+        const position = gl.getAttribLocation(program, "a_position")
+        gl.enableVertexAttribArray(position)
+        gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0)
+
+        const texture = gl.createTexture()
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          source
+        )
+
+        gl.uniform1i(gl.getUniformLocation(program, "u_texture"), 0)
+        const timeUniform = gl.getUniformLocation(program, "u_time")
+        gl.clearColor(0, 0, 0, 0)
+
+        const resize = () => {
+          const bounds = canvas.getBoundingClientRect()
+          const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+          const width = Math.max(1, Math.round(bounds.width * dpr))
+          const height = Math.max(1, Math.round(bounds.height * dpr))
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width
+            canvas.height = height
+            gl.viewport(0, 0, width, height)
+          }
+        }
+
+        const displacementAt = (u, v, time) => {
+          const horizontal =
+            Math.sin(v * 9.2 + time * 0.34) * 0.0032 +
+            Math.sin((u + v) * 17 - time * 0.21) * 0.0017 +
+            Math.cos(v * 25 + time * 0.16) * 0.0009
+          const vertical =
+            Math.cos(u * 8.4 - time * 0.29) * 0.0027 +
+            Math.sin((u * 1.4 - v) * 15 + time * 0.23) * 0.0015 +
+            Math.sin(u * 23 - time * 0.13) * 0.0008
+          const breathing =
+            Math.sin(time * 0.28 + u * 4 + v * 3) * 0.0012
+          return [
+            (horizontal + breathing) * 1.35,
+            (vertical - breathing) * 1.35,
+          ]
+        }
+
+        const start = performance.now()
+        const draw = (now) => {
+          resize()
+          const time = reducedMotion ? 0 : (now - start) / 1000
+          gl.useProgram(program)
+          gl.uniform1f(timeUniform, time)
+          gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+          if (!reducedMotion) {
+            const bounds = stage.getBoundingClientRect()
+            markers.forEach((marker) => {
+              const u = Number(marker.dataset.u)
+              const v = Number(marker.dataset.v)
+              const [dx, dy] = displacementAt(u, v, time)
+              marker.style.setProperty(
+                "--flow-x",
+                `${dx * bounds.width}px`
+              )
+              marker.style.setProperty(
+                "--flow-y",
+                `${-dy * bounds.height}px`
+              )
+            })
+          }
+
+          if (!reducedMotion) {
+            requestAnimationFrame(draw)
+          }
+        }
+
+        stage.classList.add("is-fluid-ready")
+        requestAnimationFrame(draw)
+      }
+
+      if (source.complete && source.naturalWidth) {
+        setup()
+      } else {
+        source.addEventListener("load", setup, { once: true })
+      }
+    })()
+  </script>
+</body>
+</html>

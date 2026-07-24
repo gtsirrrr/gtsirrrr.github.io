@@ -66,6 +66,130 @@
     transform: scaleY(1.8) scaleX(0.75);
     position: relative;
   }
+  .title-yi {
+    position: relative;
+    display: inline-block;
+    color: #d8d0c8;
+    transform-origin: center;
+    animation: meaningCorruption 2.05s linear 1.45s forwards;
+    will-change: color, opacity, filter, transform, text-shadow;
+  }
+  .title-yi::before,
+  .title-yi::after {
+    content: attr(data-char);
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .title-yi::before {
+    color: rgba(255, 75, 78, 0.86);
+    text-shadow: 0 0 16px rgba(255, 35, 42, 0.7);
+    animation: meaningEchoRed 2.05s steps(1, end) 1.45s forwards;
+  }
+  .title-yi::after {
+    color: rgba(120, 202, 218, 0.64);
+    mix-blend-mode: screen;
+    animation: meaningEchoCold 2.05s steps(1, end) 1.45s forwards;
+  }
+  @keyframes meaningCorruption {
+    0%, 11%, 20%, 32%, 43% {
+      color: #d8d0c8;
+      opacity: 1;
+      filter: none;
+      transform: translate(0, 0);
+      text-shadow: inherit;
+    }
+    7%, 18%, 29% {
+      color: rgba(216, 208, 200, 0.28);
+      opacity: 0.34;
+      filter: blur(0.6px) contrast(1.5);
+      transform: translate(-0.018em, 0.006em);
+    }
+    13%, 25%, 38% {
+      color: rgba(237, 229, 218, 0.92);
+      opacity: 0.92;
+      filter: brightness(1.55);
+      transform: translate(0.014em, -0.005em);
+    }
+    49% {
+      color: rgba(171, 40, 43, 0.38);
+      opacity: 0.45;
+      filter: blur(0.7px);
+    }
+    58% {
+      color: #e8dad2;
+      opacity: 1;
+      filter: brightness(1.8);
+      transform: translate(0.022em, 0);
+    }
+    66% {
+      color: rgba(155, 17, 25, 0.55);
+      opacity: 0.62;
+      filter: none;
+      transform: translate(-0.012em, 0);
+    }
+    76% {
+      color: #d34b4d;
+      opacity: 1;
+      text-shadow:
+        0 0 10px rgba(228, 48, 53, 0.55),
+        0 0 30px rgba(135, 12, 20, 0.32);
+    }
+    84% {
+      color: rgba(126, 16, 23, 0.72);
+      opacity: 0.78;
+    }
+    92%, 100% {
+      color: #b4232c;
+      opacity: 1;
+      filter: none;
+      transform: translate(0, 0);
+      text-shadow:
+        0 1px 0 rgba(255, 137, 130, 0.25),
+        0 0 12px rgba(205, 38, 45, 0.46),
+        0 0 34px rgba(121, 8, 17, 0.28);
+    }
+  }
+  @keyframes meaningEchoRed {
+    0%, 10%, 21%, 33%, 44%, 100% {
+      opacity: 0;
+      transform: translate(0, 0);
+      clip-path: inset(0 0 0 0);
+    }
+    7%, 18%, 29% {
+      opacity: 0.72;
+      transform: translate(0.035em, -0.006em);
+      clip-path: inset(12% 0 52% 0);
+    }
+    13%, 25%, 38% {
+      opacity: 0.44;
+      transform: translate(-0.025em, 0.008em);
+      clip-path: inset(58% 0 16% 0);
+    }
+    58%, 66% {
+      opacity: 0.5;
+      transform: translate(0.018em, 0);
+      clip-path: inset(28% 0 38% 0);
+    }
+  }
+  @keyframes meaningEchoCold {
+    0%, 15%, 27%, 41%, 70%, 100% {
+      opacity: 0;
+      transform: translate(0, 0);
+      clip-path: inset(0 0 0 0);
+    }
+    11%, 23%, 36% {
+      opacity: 0.58;
+      transform: translate(-0.032em, 0.006em);
+      clip-path: inset(40% 0 25% 0);
+    }
+    49%, 62% {
+      opacity: 0.34;
+      transform: translate(0.02em, -0.006em);
+      clip-path: inset(17% 0 57% 0);
+    }
+  }
   /* glitch blocks overlay */
   .glitch-container {
     position: absolute;
@@ -98,6 +222,18 @@
   }
   @keyframes fadeIn { to { opacity:1; } }
   @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+  @media (prefers-reduced-motion: reduce) {
+    .title-yi,
+    .title-yi::before,
+    .title-yi::after {
+      animation: none;
+    }
+    .title-yi {
+      color: #b4232c;
+      text-shadow: 0 0 12px rgba(205, 38, 45, 0.4);
+    }
+  }
 
   /* ── concept ── */
   .concept {
@@ -167,48 +303,298 @@
 
   /* ── tracks ── */
   .tracks {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 28px 120px;
-  }
-  .track {
-    position: relative;
-    padding: 48px 0;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    overflow: hidden;
-    min-height: 220px;
-  }
-  .track-header {
-    display: flex; align-items: baseline; gap: 16px;
-    margin-bottom: 10px;
-    position: relative; z-index: 5;
-  }
-  .track-num {
-    font-size: 2rem;
-    font-weight: 200;
-    color: var(--accent);
-    opacity: 0.5;
-  }
-  .track-name {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #d8d0c8;
-    letter-spacing: 0.08em;
-  }
-  .track-canvas-wrap {
-    position: relative;
     width: 100%;
-    height: 140px;
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: minmax(360px, 32.5vw) minmax(0, 1fr);
+    border-top: 1px solid rgba(216, 208, 200, 0.08);
+    border-bottom: 1px solid rgba(216, 208, 200, 0.08);
+    background: #0d0c0c;
   }
-  .track-canvas-wrap canvas {
+  .track-index {
+    min-height: 100svh;
+    padding: clamp(54px, 7vh, 82px) clamp(34px, 4.3vw, 70px);
+    border-right: 1px solid rgba(216, 208, 200, 0.16);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 3;
+  }
+  .track-index-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+    color: rgba(216, 208, 200, 0.72);
+    white-space: nowrap;
+  }
+  .track-index-album {
+    display: inline-block;
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.45rem, 2.35vw, 2.15rem);
+    font-weight: 200;
+    letter-spacing: 0.12em;
+    transform: scaleY(1.3);
+    transform-origin: left center;
+  }
+  .track-index-album .meaning {
+    color: #b4232c;
+    text-shadow: 0 0 12px rgba(180, 35, 44, 0.22);
+  }
+  .track-index-slash {
+    color: rgba(216, 208, 200, 0.24);
+    font-size: 1.2rem;
+  }
+  .track-index-label {
+    color: rgba(216, 208, 200, 0.42);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.38em;
+  }
+  .track-index-list {
+    margin-top: clamp(84px, 13vh, 132px);
+    display: grid;
+    gap: clamp(26px, 4.2vh, 47px);
+  }
+  .track-index-button {
+    width: 100%;
+    border: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 20px;
+    background: transparent;
+    color: rgba(216, 208, 200, 0.32);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: color 420ms ease, transform 420ms ease;
+  }
+  .track-index-button:hover,
+  .track-index-button:focus-visible {
+    color: rgba(216, 208, 200, 0.68);
+    transform: translateX(4px);
+    outline: none;
+  }
+  .track-index-button[aria-selected="true"] {
+    color: rgba(239, 234, 227, 0.95);
+  }
+  .track-index-num {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.35rem, 2vw, 1.9rem);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  .track-index-name {
+    font-size: clamp(1.05rem, 1.65vw, 1.42rem);
+    font-weight: 300;
+    letter-spacing: 0.14em;
+  }
+  .track-stage {
+    min-height: 100svh;
+    position: relative;
+    z-index: 0;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: #0d0c0c;
+  }
+  .track-stage-image {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    transform: scale(1.025);
+    transition: opacity 220ms ease,
+                transform 2200ms cubic-bezier(.22,.61,.36,1);
   }
-  .track-fade {
-    opacity: 0; transform: translateY(24px);
-    transition: opacity 0.9s ease, transform 0.9s ease;
+  .track-stage-image.is-visible {
+    opacity: 0.28;
+    transform: scale(1);
+    transition: opacity 1100ms cubic-bezier(.22,.61,.36,1),
+                transform 2200ms cubic-bezier(.22,.61,.36,1);
   }
-  .track-fade.visible { opacity:1; transform:translateY(0); }
+  .track-stage-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(13, 12, 12, 0.46);
+    pointer-events: none;
+  }
+  .track-detail {
+    width: min(760px, 78%);
+    min-height: 560px;
+    padding-top: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .track-detail-number {
+    position: absolute;
+    top: 2%;
+    left: 0;
+    color: rgba(216, 208, 200, 0.055);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(15rem, 29vw, 27rem);
+    font-weight: 400;
+    line-height: 0.82;
+    letter-spacing: -0.08em;
+    pointer-events: none;
+    user-select: none;
+  }
+  .track-detail-title,
+  .track-detail-quote,
+  .track-detail-meta,
+  .track-detail-signal {
+    position: relative;
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(5px);
+    transition:
+      opacity 760ms cubic-bezier(.22,.61,.36,1),
+      transform 760ms cubic-bezier(.22,.61,.36,1),
+      filter 760ms cubic-bezier(.22,.61,.36,1);
+  }
+  .track-detail-number {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 850ms ease, transform 850ms ease;
+  }
+  .track-detail-number.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .track-detail-title.is-visible,
+  .track-detail-quote.is-visible,
+  .track-detail-meta.is-visible,
+  .track-detail-signal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  .track-detail-title {
+    margin-top: 56px;
+    color: #e4ded7;
+    font-size: clamp(2.65rem, 5.7vw, 5.35rem);
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    line-height: 1.25;
+    text-wrap: balance;
+    transform: translateY(16px) scaleY(1.3);
+    transform-origin: left center;
+  }
+  .track-detail-title.is-visible {
+    transform: translateY(0) scaleY(1.3);
+  }
+  .track-detail-quote {
+    margin-top: 38px;
+    color: rgba(216, 208, 200, 0.68);
+    font-size: clamp(0.98rem, 1.55vw, 1.28rem);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    line-height: 1.9;
+  }
+  .track-detail-accent {
+    width: 24px;
+    border-top: 1px solid rgba(180, 35, 44, 0.86);
+    margin-top: 38px;
+  }
+  .track-detail-meta {
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    gap: 19px;
+    color: rgba(216, 208, 200, 0.43);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.31em;
+    text-transform: uppercase;
+  }
+  .track-detail-meta span + span::before {
+    content: '';
+    width: 26px;
+    border-top: 1px solid rgba(216, 208, 200, 0.2);
+    display: inline-block;
+    margin: 0 18px 3px 0;
+  }
+  .track-detail-signal {
+    width: min(100%, 680px);
+    border-top: 1px solid rgba(180, 35, 44, 0.42);
+    margin-top: 70px;
+  }
+  .track-detail-signal::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 28%;
+    width: 6px;
+    height: 6px;
+    background: #b23a3e;
+  }
+
+  @media (max-width: 820px) {
+    .tracks {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+    .track-index {
+      min-height: auto;
+      padding: 56px 24px 38px;
+      border-right: 0;
+      border-bottom: 1px solid rgba(216, 208, 200, 0.12);
+    }
+    .track-index-list {
+      margin-top: 48px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 16px;
+    }
+    .track-index-button {
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+    }
+    .track-index-name {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+    }
+    .track-stage {
+      min-height: 76svh;
+    }
+    .track-detail {
+      width: calc(100% - 48px);
+      min-height: 520px;
+    }
+    .track-detail-number {
+      top: 10%;
+      font-size: clamp(10rem, 47vw, 16rem);
+    }
+    .track-detail-title {
+      font-size: clamp(2.4rem, 11.5vw, 4rem);
+    }
+    .track-detail-quote {
+      max-width: 88%;
+    }
+    .track-detail-signal {
+      margin-top: 54px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-index-button,
+    .track-stage-image,
+    .track-detail-number,
+    .track-detail-title,
+    .track-detail-quote,
+    .track-detail-meta,
+    .track-detail-signal {
+      transition-duration: 1ms;
+    }
+  }
 
   /* ── footer ── */
   .page-footer {
@@ -224,12 +610,12 @@
 </head>
 <body>
 
-<a href="/" class="back">← 返回星图</a>
+<a href="/" class="back">← 返回</a>
 
 <section class="hero" id="heroSection">
   <canvas id="heroCanvas"></canvas>
   <div class="hero-content">
-    <div class="hero-title" id="heroTitle">失义症
+    <div class="hero-title" id="heroTitle"><span>失</span><span class="title-yi" data-char="义">义</span><span>症</span>
       <div class="glitch-container" id="glitchContainer"></div>
     </div>
     <div class="hero-sub">COMING SOON 2026</div>
@@ -251,15 +637,46 @@
   </div>
 </section>
 
-<section class="tracks" id="tracks">
+<section class="tracks" id="tracks" aria-label="失义症曲目介绍">
+  <aside class="track-index">
+    <div class="track-index-brand" aria-label="失义症曲目索引">
+      <span class="track-index-album">失<span class="meaning">义</span>症</span>
+      <span class="track-index-slash">/</span>
+      <span class="track-index-label">TRACK INDEX</span>
+    </div>
+    <nav class="track-index-list" id="trackIndex" aria-label="曲目列表"></nav>
+  </aside>
+
+  <div class="track-stage" id="trackStage" aria-live="polite">
+    <img
+      class="track-stage-image"
+      id="trackStageImage"
+      src="/images/dysmeania/tracks/01-thebes.jpg"
+      alt=""
+      decoding="async"
+    >
+    <div class="track-stage-shade" aria-hidden="true"></div>
+    <article class="track-detail">
+      <div class="track-detail-number" id="trackDetailNumber" aria-hidden="true">01</div>
+      <h2 class="track-detail-title" id="trackDetailTitle">来自底比斯</h2>
+      <p class="track-detail-quote" id="trackDetailQuote">“追寻者前往未往的非往。”</p>
+      <div class="track-detail-accent" aria-hidden="true"></div>
+      <div class="track-detail-meta" id="trackDetailMeta">
+        <span id="trackDetailLabel">TRACK 01</span>
+        <span id="trackDetailDuration">05:12</span>
+        <span>JAKE PEI</span>
+      </div>
+      <div class="track-detail-signal" id="trackDetailSignal" aria-hidden="true"></div>
+    </article>
+  </div>
 </section>
 
 <div class="page-footer">
-  © 2026 <a href="/">Jake Pei|裴峙丞</a> · <a href="/">← 返回星图</a>
+  © 2026 <a href="/">Jake Pei|裴峙丞</a> · <a href="/">← 返回</a>
 </div>
 
 <script type="module">
-import { prepareWithSegments, layoutNextLine, layoutWithLines }
+import { prepareWithSegments, layoutWithLines }
   from 'https://esm.sh/@chenglou/pretext@0.0.4'
 
 const dpr = window.devicePixelRatio || 1
@@ -268,35 +685,154 @@ const dpr = window.devicePixelRatio || 1
 // TRACK DATA
 // ═══════════════════════════════════════════════
 const TRACKS = [
-  { num:'01', name:'来自底比斯', desc:'"追寻者前往未往的非往。"', hue:0 },
-  { num:'02', name:'罐装星期二', desc:'"罐头里有什么你早就知道了。"', hue:45 },
-  { num:'03', name:'不信徒', desc:'"每一次世界的跃进，都伴随意义的拷问。"', hue:220 },
-  { num:'04', name:'灵魂拷贝法', desc:'"若记忆于代际间延续，我还在哪里？"', hue:280 },
-  { num:'05', name:'城墙外', desc:'"城墙外，荒芜而自由。"', hue:150 },
-  { num:'06', name:'世界肢解计划', desc:'"空旷的地球狭窄得容不下你我。"', hue:10 },
+  {
+    num:'01',
+    name:'来自底比斯',
+    desc:'“追寻者前往未往的非往。”',
+    duration:'05:12',
+    image:'/images/dysmeania/tracks/01-thebes.jpg',
+    imageAlt:'暗处残损的底比斯石像'
+  },
+  {
+    num:'02',
+    name:'罐装星期二',
+    desc:'“生活是一种可预计的酸甜。”',
+    duration:'04:47',
+    image:'/images/dysmeania/tracks/02-canned-tuesday.jpg',
+    imageAlt:'黑暗传送带上的无标签罐头'
+  },
+  {
+    num:'03',
+    name:'不信徒',
+    desc:'“失望者施妄，失意者失义。”',
+    duration:'05:33',
+    image:'/images/dysmeania/tracks/03-unbeliever.jpg',
+    imageAlt:'面向空白建筑开口的孤独身影'
+  },
+  {
+    num:'04',
+    name:'灵魂拷贝法',
+    desc:'“记忆于代际间存续，我在演唱悲歌。”',
+    duration:'05:18',
+    image:'/images/dysmeania/tracks/04-soul-copy.jpg',
+    imageAlt:'玻璃档案柜中重叠的两个人像'
+  },
+  {
+    num:'05',
+    name:'城墙外',
+    desc:'“城墙外，是荒芜，是自由。”',
+    duration:'04:58',
+    image:'/images/dysmeania/tracks/05-beyond-the-wall.jpg',
+    imageAlt:'巨大城墙缺口外的空旷地平线'
+  },
+  {
+    num:'06',
+    name:'世界肢解计划',
+    desc:'“空旷的地球狭窄得容不下你我。”',
+    duration:'07:04',
+    image:'/images/dysmeania/tracks/06-world-disassembly.jpg',
+    imageAlt:'被分割成数层的破裂石质球体'
+  },
 ]
-
-// Industrial symbols (Unicode)
-const SYMBOLS = ['⚙','⛭','⬡','▲']
 
 // ═══════════════════════════════════════════════
 // BUILD TRACK DOM
 // ═══════════════════════════════════════════════
-const tracksContainer = document.getElementById('tracks')
-TRACKS.forEach((tr, idx) => {
-  const div = document.createElement('div')
-  div.className = 'track track-fade'
-  div.innerHTML = `
-    <div class="track-header">
-      <div class="track-num">${tr.num}</div>
-      <div class="track-name">${tr.name}</div>
-    </div>
-    <div class="track-canvas-wrap">
-      <canvas data-idx="${idx}"></canvas>
-    </div>
+const trackSection = document.getElementById('tracks')
+const trackIndex = document.getElementById('trackIndex')
+const trackStageImage = document.getElementById('trackStageImage')
+const trackDetailNumber = document.getElementById('trackDetailNumber')
+const trackDetailTitle = document.getElementById('trackDetailTitle')
+const trackDetailQuote = document.getElementById('trackDetailQuote')
+const trackDetailMeta = document.getElementById('trackDetailMeta')
+const trackDetailLabel = document.getElementById('trackDetailLabel')
+const trackDetailDuration = document.getElementById('trackDetailDuration')
+const trackDetailSignal = document.getElementById('trackDetailSignal')
+const detailSequence = [
+  trackDetailNumber,
+  trackDetailTitle,
+  trackDetailQuote,
+  trackDetailMeta,
+  trackDetailSignal,
+]
+let activeTrack = 0
+let trackSequenceToken = 0
+let tracksEntered = false
+
+TRACKS.forEach((track, index) => {
+  const button = document.createElement('button')
+  button.className = 'track-index-button'
+  button.type = 'button'
+  button.setAttribute('role', 'tab')
+  button.setAttribute('aria-selected', index === 0 ? 'true' : 'false')
+  button.setAttribute('aria-controls', 'trackStage')
+  button.innerHTML = `
+    <span class="track-index-num">${track.num}</span>
+    <span class="track-index-name">${track.name}</span>
   `
-  tracksContainer.appendChild(div)
+  button.addEventListener('click', () => revealTrack(index))
+  trackIndex.appendChild(button)
+
+  const preload = new Image()
+  preload.src = track.image
 })
+
+function hideTrackDetail() {
+  detailSequence.forEach(el => el.classList.remove('is-visible'))
+  trackStageImage.classList.remove('is-visible')
+}
+
+function revealTrack(index, instant = false) {
+  activeTrack = index
+  const track = TRACKS[index]
+  const token = ++trackSequenceToken
+  const buttons = Array.from(trackIndex.querySelectorAll('.track-index-button'))
+
+  buttons.forEach((button, buttonIndex) => {
+    button.setAttribute('aria-selected', buttonIndex === index ? 'true' : 'false')
+  })
+  hideTrackDetail()
+
+  const swapDelay = instant ? 0 : 170
+  window.setTimeout(() => {
+    if (token !== trackSequenceToken) return
+
+    trackDetailNumber.textContent = track.num
+    trackDetailTitle.textContent = track.name
+    trackDetailQuote.textContent = track.desc
+    trackDetailLabel.textContent = `TRACK ${track.num}`
+    trackDetailDuration.textContent = track.duration
+    trackStageImage.alt = track.imageAlt
+    trackStageImage.src = track.image
+
+    const revealDelays = instant
+      ? [0, 70, 140, 220, 300]
+      : [80, 270, 500, 700, 840]
+
+    detailSequence.forEach((element, sequenceIndex) => {
+      window.setTimeout(() => {
+        if (token !== trackSequenceToken) return
+        element.classList.add('is-visible')
+      }, revealDelays[sequenceIndex])
+    })
+
+    window.setTimeout(() => {
+      if (token !== trackSequenceToken) return
+      trackStageImage.classList.add('is-visible')
+    }, instant ? 380 : 1040)
+  }, swapDelay)
+}
+
+const trackEntryObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting || tracksEntered) return
+    tracksEntered = true
+    revealTrack(activeTrack, true)
+    trackEntryObserver.disconnect()
+  })
+}, { threshold: 0.28 })
+
+trackEntryObserver.observe(trackSection)
 
 // ═══════════════════════════════════════════════
 // HERO: gravity drop triggered by leaving viewport
@@ -399,126 +935,6 @@ TRACKS.forEach((tr, idx) => {
 })()
 
 // ═══════════════════════════════════════════════
-// TRACK CANVAS: falling symbols + Pretext reflow
-// ═══════════════════════════════════════════════
-function initTrackCanvas(canvas, idx) {
-  const tr = TRACKS[idx]
-  const wrap = canvas.parentElement
-  const rect = wrap.getBoundingClientRect()
-  const W = rect.width, H = rect.height
-  canvas.width = W*dpr; canvas.height = H*dpr
-  canvas.style.width = W+'px'; canvas.style.height = H+'px'
-  const ctx = canvas.getContext('2d')
-  ctx.scale(dpr, dpr)
-
-  const FONT = '300 14px "Noto Serif SC", serif'
-  const LINE_H = 24
-  const PAD = 8
-  const textContent = tr.desc
-
-  const prepared = prepareWithSegments(textContent, FONT)
-
-  // Falling industrial symbols
-  const symbolCount = 8 + Math.floor(Math.random()*5)
-  const fallingSymbols = Array.from({length: symbolCount}, () => {
-    const sym = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]
-    const size = 22 + Math.random()*18
-    return {
-      sym, size,
-      x: PAD + Math.random()*(W - PAD*2 - size),
-      y: -size - Math.random()*120,  // start above
-      vy: 0.3 + Math.random()*0.4,
-      targetY: 20 + Math.random()*(H - 60),
-      settled: false,
-      rotation: Math.random()*0.3 - 0.15,
-      hue: tr.hue,
-    }
-  })
-
-  let t0 = null
-
-  function frame(ts) {
-    if (!t0) t0 = ts
-    ctx.clearRect(0, 0, W, H)
-
-    // Update falling symbols
-    const obstacles = []
-    for (const s of fallingSymbols) {
-      if (!s.settled) {
-        s.y += s.vy
-        if (s.y >= s.targetY) {
-          s.y = s.targetY; s.settled = true
-        }
-      }
-      obstacles.push({
-        x: s.x - 4,
-        y: s.y - 4,
-        w: s.size + 8,
-        h: s.size + 8,
-      })
-
-      // Draw symbol
-      ctx.save()
-      ctx.translate(s.x + s.size/2, s.y + s.size/2)
-      ctx.rotate(s.rotation)
-      ctx.font = `${s.size}px "Noto Serif SC", serif`
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-      ctx.fillStyle = `hsla(${s.hue}, 15%, 35%, 0.5)`
-      ctx.fillText(s.sym, 0, 0)
-      ctx.restore()
-    }
-
-    // Pretext: lay out text line by line, avoiding obstacles
-    ctx.font = FONT; ctx.textBaseline = 'top'
-    ctx.fillStyle = 'rgba(184,176,168,0.75)'
-
-    let cursor = { segmentIndex: 0, graphemeIndex: 0 }
-    let y = PAD
-
-    while (y + LINE_H < H - 4) {
-      // Calculate available width for this line, carving out obstacles
-      let lineX = PAD
-      let lineW = W - PAD * 2
-
-      for (const ob of obstacles) {
-        const obTop = ob.y, obBot = ob.y + ob.h
-        // Does this obstacle overlap our line band?
-        if (y + LINE_H > obTop && y < obBot) {
-          const obLeft = ob.x, obRight = ob.x + ob.w
-          // Carve from the side that loses less space
-          const leftSpace = obLeft - PAD
-          const rightSpace = (W - PAD) - obRight
-
-          if (leftSpace >= rightSpace && leftSpace > 30) {
-            lineW = Math.min(lineW, leftSpace)
-          } else if (rightSpace > 30) {
-            const newX = obRight
-            if (newX > lineX) {
-              lineW -= (newX - lineX)
-              lineX = newX
-            }
-          } else {
-            lineW = 0
-          }
-        }
-      }
-
-      if (lineW < 30) { y += LINE_H; continue }
-
-      const line = layoutNextLine(prepared, cursor, lineW)
-      if (!line) break
-      ctx.fillText(line.text, lineX, y)
-      cursor = line.end
-      y += LINE_H
-    }
-
-    requestAnimationFrame(frame)
-  }
-
-  requestAnimationFrame(frame)
-}
-
-// ═══════════════════════════════════════════════
 // COVER: particle release effect
 // ═══════════════════════════════════════════════
 ;(function initCoverParticles() {
@@ -602,16 +1018,11 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('visible')
-      const c = e.target.querySelector('canvas[data-idx]')
-      if (c && !c._inited) {
-        c._inited = true
-        initTrackCanvas(c, parseInt(c.dataset.idx))
-      }
     }
   })
 }, { threshold: 0.15 })
 
-document.querySelectorAll('.track-fade, .concept-quote, .concept-body').forEach(el => observer.observe(el))
+document.querySelectorAll('.concept-quote, .concept-body').forEach(el => observer.observe(el))
 
 // ═══════════════════════════════════════════════
 // ONE-SHOT GLITCH BLOCKS on hero title

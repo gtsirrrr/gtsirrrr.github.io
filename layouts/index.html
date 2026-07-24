@@ -1,423 +1,1937 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jake Pei | 裴峙丞的个人主页</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;600;700&family=ZCOOL+XiaoWei&display=swap');
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: #05080f;
-    color: #e0ddd5;
-  }
-
-  canvas#cosmos {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-  }
-
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    padding: 20px 36px;
-    background: linear-gradient(to bottom, rgba(5,8,15,0.8), transparent);
-    pointer-events: none;
-  }
-  nav .logo {
-    font-family: 'Noto Serif SC', serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #c8c4ba;
-    letter-spacing: 0.04em;
-    pointer-events: auto;
-  }
-
-  .subtitle-area {
-    position: fixed;
-    z-index: 50;
-    left: 50%;
-    top: 64%;
-    transform: translateX(-50%);
-    text-align: center;
-    pointer-events: none;
-    opacity: 0;
-    animation: fadeInUp 1.8s ease 1.2s forwards;
-  }
-  .subtitle-area .tagline {
-    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
-    font-size: clamp(0.95rem, 2vw, 1.2rem);
-    color: rgba(200, 196, 186, 0.75);
-    letter-spacing: 0.15em;
-    line-height: 2;
-    text-shadow: 0 0 30px rgba(100, 140, 220, 0.15);
-  }
-  .subtitle-area .tagline .accent { color: #f0c866; }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
-
-  #tooltip {
-    position: fixed;
-    z-index: 200;
-    font-family: 'Noto Serif SC', serif;
-    font-size: 0.82rem;
-    color: rgba(230,226,218,0.92);
-    background: rgba(12,15,28,0.88);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
-    padding: 6px 16px;
-    border-radius: 8px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-    white-space: nowrap;
-  }
-  #tooltip.visible { opacity: 1; }
-
-  .footer {
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;
-    font-family: 'Noto Serif SC', serif;
-    font-size: 0.7rem;
-    color: rgba(200,196,186,0.25);
-    letter-spacing: 0.05em;
-    pointer-events: auto;
-    white-space: nowrap;
-  }
-  .footer a {
-    color: rgba(200,196,186,0.35);
-    text-decoration: none;
-  }
-  .footer a:hover { color: rgba(240,200,102,0.6); }
-</style>
-</head>
-<body>
-
-<canvas id="cosmos"></canvas>
-<div id="tooltip"></div>
-
-<nav><div class="logo">Jake Pei | 裴峙丞</div></nav>
-
-<div class="subtitle-area">
-  <div class="tagline">
-    用代码解析和弦，令算法谱写旋律。<br>
-    <span class="accent">Music</span> × <span class="accent">Data</span> × <span class="accent">Machine Learning</span>
-  </div>
-</div>
-
-<div class="footer">
-  © 2026 <a href="#">Jake Pei|裴峙丞的个人主页</a> · Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> & <a href="https://github.com/adityatelange/hugo-PaperMod" target="_blank">PaperMod</a>
-</div>
-
-<script>
-const canvas = document.getElementById('cosmos')
-const ctx = canvas.getContext('2d')
-const tooltip = document.getElementById('tooltip')
-const dpr = window.devicePixelRatio || 1
-let W, H
-
-function resize() {
-  W = window.innerWidth; H = window.innerHeight
-  canvas.width = W * dpr; canvas.height = H * dpr
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-}
-resize()
-window.addEventListener('resize', resize)
-
-// ── Stars ───────────────────────────────────────────
-const stars = Array.from({ length: 300 }, () => ({
-  x: Math.random(), y: Math.random(),
-  r: Math.random() * 1.5 + 0.3,
-  ts: Math.random() * 0.02 + 0.005,
-  tp: Math.random() * Math.PI * 2,
-  hue: Math.random() > 0.7 ? 40 + Math.random() * 20 : 210 + Math.random() * 40,
-}))
-function drawStars(t) {
-  for (const s of stars) {
-    const a = 0.3 + 0.5 * (0.5 + 0.5 * Math.sin(t * s.ts + s.tp))
-    ctx.beginPath()
-    ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2)
-    ctx.fillStyle = `hsla(${s.hue},60%,82%,${a})`
-    ctx.fill()
-  }
-}
-
-function drawNebula() {
-  const g1 = ctx.createRadialGradient(W*0.3,H*0.25,0,W*0.3,H*0.25,W*0.6)
-  g1.addColorStop(0,'rgba(25,35,80,0.12)'); g1.addColorStop(1,'transparent')
-  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H)
-  const g2 = ctx.createRadialGradient(W*0.75,H*0.7,0,W*0.75,H*0.7,W*0.45)
-  g2.addColorStop(0,'rgba(60,30,80,0.08)'); g2.addColorStop(1,'transparent')
-  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H)
-}
-
-// ── Generic planet ──────────────────────────────────
-function drawPlanet(cx, cy, r, c) {
-  // Atmosphere glow
-  const at = ctx.createRadialGradient(cx,cy,r*0.85,cx,cy,r*2.5)
-  at.addColorStop(0, c.glow1); at.addColorStop(0.4, c.glow2); at.addColorStop(1,'transparent')
-  ctx.fillStyle = at; ctx.fillRect(cx-r*3,cy-r*3,r*6,r*6)
-
-  ctx.save()
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip()
-  // Body
-  const bg = ctx.createRadialGradient(cx-r*0.3,cy-r*0.3,0,cx,cy,r)
-  bg.addColorStop(0,c.hi); bg.addColorStop(0.5,c.mid); bg.addColorStop(1,c.lo)
-  ctx.fillStyle = bg; ctx.fill()
-  // Bands
-  ctx.globalAlpha = 0.18
-  for (let i = 0; i < 4; i++) {
-    const by = cy-r+(r*2*(i+0.5))/4, bh = r*0.14
-    const gr = ctx.createLinearGradient(cx-r,by,cx+r,by)
-    gr.addColorStop(0,'transparent'); gr.addColorStop(0.3,c.band1); gr.addColorStop(0.7,c.band2); gr.addColorStop(1,'transparent')
-    ctx.fillStyle = gr; ctx.fillRect(cx-r,by-bh/2,r*2,bh)
-  }
-  ctx.globalAlpha = 1
-  // Specular
-  const sp = ctx.createRadialGradient(cx-r*0.35,cy-r*0.35,0,cx-r*0.35,cy-r*0.35,r*0.7)
-  sp.addColorStop(0,'rgba(255,255,255,0.30)'); sp.addColorStop(0.5,'rgba(255,255,255,0.08)'); sp.addColorStop(1,'transparent')
-  ctx.fillStyle = sp; ctx.fillRect(cx-r,cy-r,r*2,r*2)
-  ctx.restore()
-  // Rim
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2)
-  ctx.strokeStyle = c.rim; ctx.lineWidth = 1.2; ctx.stroke()
-}
-
-// Planet color presets
-const COL_BLUE = {
-  hi:'#5a8cd2', mid:'#325aa0', lo:'#142858',
-  glow1:'rgba(100,160,240,0.14)', glow2:'rgba(80,130,210,0.06)',
-  band1:'rgba(130,185,245,0.35)', band2:'rgba(80,140,200,0.20)',
-  rim:'rgba(130,190,255,0.22)'
-}
-const COL_GOLD = {
-  hi:'#d2aa46', mid:'#a07828', lo:'#5a4114',
-  glow1:'rgba(210,170,70,0.14)', glow2:'rgba(180,140,50,0.06)',
-  band1:'rgba(230,190,90,0.35)', band2:'rgba(180,140,60,0.20)',
-  rim:'rgba(240,200,100,0.22)'
-}
-const COL_GREEN = {
-  hi:'#50be82', mid:'#288250', lo:'#0f4628',
-  glow1:'rgba(80,190,130,0.14)', glow2:'rgba(60,150,100,0.06)',
-  band1:'rgba(100,210,150,0.35)', band2:'rgba(60,160,100,0.20)',
-  rim:'rgba(100,220,150,0.22)'
-}
-const COL_ROSE = {
-  hi:'#d26e96', mid:'#a03c64', lo:'#5a1e37',
-  glow1:'rgba(210,110,150,0.14)', glow2:'rgba(180,80,120,0.06)',
-  band1:'rgba(230,140,170,0.35)', band2:'rgba(180,90,130,0.20)',
-  rim:'rgba(240,140,180,0.22)'
-}
-
-// ── Ring text renderer ──────────────────────────────
-function drawRingText(cx, cy, pR, t, chars, hue, speed, aMul, bMul, tilt, fsMul) {
-  const a = pR * aMul, b = pR * bMul
-  const fs = Math.max(13, Math.min(30, pR * fsMul))
-
-  ctx.save()
-  ctx.translate(cx, cy)
-  ctx.rotate(tilt)
-
-  for (let i = 0; i < chars.length; i++) {
-    const ang = (i / chars.length) * Math.PI * 2 + t * speed
-    const x = a * Math.cos(ang), y = b * Math.sin(ang)
-    const depth = Math.sin(ang)
-    const sc = 0.6 + 0.4 * (0.5 + 0.5 * depth)
-    const al = depth > -0.1 ? (0.45 + 0.55 * depth) : 0.06
-
-    if (Math.sqrt(x*x+y*y) < pR * 0.92 && depth < 0) continue
-    const ch = chars[i]
-    if (ch === '　') continue
-
-    ctx.save()
-    ctx.translate(x, y)
-    ctx.scale(sc, sc * 1.85) // vertical stretch
-
-    ctx.font = `300 ${fs}px "Noto Serif SC", serif`
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-
-    if (depth > 0.3) {
-      ctx.shadowColor = `hsla(${hue},70%,75%,0.45)`; ctx.shadowBlur = 14
-    } else {
-      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080909">
+  <meta name="description" content="Jake Pei｜裴峙丞的音乐空间">
+  <title>Jake Pei｜裴峙丞的音乐空间</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Bebas+Neue&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #000000;
+      --ink: #e9e9e5;
+      --muted: #b7b9b5;
+      --mint: #58e7ab;
+      --hub-size: 128px;
     }
 
-    ctx.fillStyle = depth > 0
-      ? `hsla(${hue},65%,${62+depth*22}%,${al})`
-      : `hsla(${hue},25%,60%,${al})`
-    ctx.fillText(ch === '·' ? '✦' : ch, 0, 0)
-    ctx.restore()
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  ctx.beginPath()
-  ctx.ellipse(0,0,a,b,0,0,Math.PI*2)
-  ctx.strokeStyle = `hsla(${hue},40%,60%,0.06)`
-  ctx.lineWidth = 0.5; ctx.stroke()
-  ctx.restore()
-}
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+    }
 
-// ── Dust ────────────────────────────────────────────
-function mkDust(n) {
-  return Array.from({length:n},()=>({
-    a: Math.random()*Math.PI*2,
-    s: (Math.random()*0.0004+0.0001)*(Math.random()>0.5?1:-1),
-    rM: 2+Math.random()*1.2, bM: 0.4+Math.random()*0.3,
-    sz: Math.random()*1.5+0.5, al: Math.random()*0.3+0.1,
-  }))
-}
-function drawDust(cx,cy,pR,dust,tilt,hue) {
-  ctx.save(); ctx.translate(cx,cy); ctx.rotate(tilt)
-  for (const d of dust) {
-    d.a += d.s
-    const a2=pR*d.rM, b2=pR*d.bM
-    const x=a2*Math.cos(d.a), y=b2*Math.sin(d.a), dp=Math.sin(d.a)
-    if (dp<-0.2 && Math.sqrt(x*x+y*y)<pR*0.9) continue
-    ctx.beginPath(); ctx.arc(x,y,d.sz,0,Math.PI*2)
-    ctx.fillStyle = `hsla(${hue},50%,80%,${d.al*(0.5+0.5*dp)})`
-    ctx.fill()
-  }
-  ctx.restore()
-}
+    body {
+      color: var(--ink);
+      font-family: "Noto Sans SC", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
 
-// ── Build ring chars (reversed) ─────────────────────
-function ringChars(text) {
-  const c = [...text].reverse()
-  return [...c, ...'·', ...c, ...'·']
-}
+    button,
+    a {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-// ══════════════════════════════════════════════════════
-// SCENE DATA
-// ══════════════════════════════════════════════════════
-const mainRing = (function() {
-  const c = [...'你好！我是裴峙丞！'].reverse()
-  return [...c, ...'·', ...c, ...'·']
-})()
-const mainDust = mkDust(40)
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      isolation: isolate;
+      overflow: hidden;
+      background: var(--bg);
+    }
 
-const minis = [
-  {
-    label:'恣意的音乐空间', href:'/music/',
-    ring: ringChars('恣意的音乐空间'),
-    col: COL_GOLD, hue: 42, dust: mkDust(15),
-    px:0.15, py:0.30, szM:0.48, fp:0, fa:8,
-    os:0.0004, tilt:-0.2,
-  },
-  {
-    label:'机器学习实验室', href:'/ml/',
-    ring: ringChars('机器学习实验室'),
-    col: COL_GREEN, hue: 150, dust: mkDust(15),
-    px:0.84, py:0.26, szM:0.42, fp:2.1, fa:10,
-    os:-0.00035, tilt:0.18,
-  },
-  {
-    label:'创意持续在冒泡', href:'/creative/',
-    ring: ringChars('创意持续在冒泡'),
-    col: COL_ROSE, hue: 340, dust: mkDust(15),
-    px:0.80, py:0.72, szM:0.40, fp:4.2, fa:9,
-    os:0.00038, tilt:-0.12,
-  },
-]
+    #universe-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
 
-// ── Hit testing ─────────────────────────────────────
-let hitTargets = []
+    .membrane-reveal {
+      position: absolute;
+      inset: 2.5%;
+      z-index: 2;
+      opacity: 0;
+      transform: scale(0.04);
+      transform-origin: 49% 53%;
+      pointer-events: none;
+      will-change: opacity, transform, filter;
+    }
 
-canvas.addEventListener('mousemove', e => {
-  let hit = null
-  for (const p of hitTargets) {
-    const dx=e.clientX-p.cx, dy=e.clientY-p.cy
-    if (dx*dx+dy*dy < (p.r+12)**2) { hit = p; break }
-  }
-  if (hit) {
-    canvas.style.cursor = 'pointer'
-    tooltip.textContent = hit.label
-    tooltip.style.left = (hit.cx + hit.r + 14) + 'px'
-    tooltip.style.top = (hit.cy - 16) + 'px'
-    tooltip.classList.add('visible')
-  } else {
-    canvas.style.cursor = 'default'
-    tooltip.classList.remove('visible')
-  }
-})
+    .membrane-reveal img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center right;
+      opacity: 0.9;
+      mix-blend-mode: screen;
+      transform-origin: 76% 52%;
+      will-change: transform, filter;
+      animation: membraneFloat 12.5s cubic-bezier(.45, .05, .55, .95) infinite alternate;
+    }
 
-canvas.addEventListener('click', e => {
-  for (const p of hitTargets) {
-    const dx=e.clientX-p.cx, dy=e.clientY-p.cy
-    if (dx*dx+dy*dy < (p.r+12)**2) { window.location.href = p.href; break }
-  }
-})
+    .stage.expanded .membrane-reveal {
+      animation: membraneBurst 1.7s cubic-bezier(.16, .82, .18, 1) forwards;
+    }
 
-canvas.addEventListener('touchstart', e => {
-  const t = e.touches[0]
-  for (const p of hitTargets) {
-    const dx=t.clientX-p.cx, dy=t.clientY-p.cy
-    if (dx*dx+dy*dy < (p.r+15)**2) { window.location.href = p.href; break }
-  }
-}, {passive:true})
+    .identity {
+      position: absolute;
+      z-index: 6;
+      top: clamp(64px, 10.8vh, 116px);
+      left: clamp(34px, 5vw, 84px);
+      width: min(46vw, 610px);
+      pointer-events: none;
+    }
 
-// ══════════════════════════════════════════════════════
-// RENDER LOOP
-// ══════════════════════════════════════════════════════
-let t0 = null
+    .identity-title {
+      position: relative;
+      display: inline-block;
+      margin-left: 12px;
+      white-space: nowrap;
+      color: #ecece8;
+      font-family: "Bebas Neue", "Barlow Condensed", "Arial Narrow", sans-serif;
+      --title-scale-x: 0.64;
+      font-size: clamp(9rem, 20.8vw, 19.5rem);
+      font-weight: 400;
+      line-height: 0.78;
+      letter-spacing: -0.025em;
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      filter: blur(18px);
+      transform: translateX(-26px) scaleX(var(--title-scale-x));
+      transform-origin: left center;
+      animation: titleReveal 1.75s cubic-bezier(.18, .74, .12, 1) 0.16s forwards;
+    }
 
-function frame(ts) {
-  if (!t0) t0 = ts
-  const t = ts - t0
+    .identity-title::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      color: transparent;
+      opacity: 0;
+      text-shadow:
+        8px 1px rgba(61, 100, 255, 0.42),
+        15px 2px rgba(76, 235, 174, 0.32),
+        23px 3px rgba(255, 100, 52, 0.24);
+      animation: spectralEcho 1.55s ease-out 0.28s forwards;
+      pointer-events: none;
+    }
 
-  ctx.clearRect(0,0,W,H)
+    .intro {
+      margin-top: clamp(28px, 3.5vh, 42px);
+      color: var(--muted);
+      font-size: clamp(0.98rem, 1.45vw, 1.35rem);
+      font-weight: 300;
+      line-height: 1.9;
+      letter-spacing: 0.055em;
+    }
 
-  // Background
-  const bg = ctx.createLinearGradient(0,0,0,H)
-  bg.addColorStop(0,'#050810'); bg.addColorStop(0.4,'#080d1a')
-  bg.addColorStop(0.7,'#0a0f20'); bg.addColorStop(1,'#060a14')
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H)
+    .intro-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(7px);
+      animation: copyReveal 0.9s cubic-bezier(.2, .8, .2, 1) forwards;
+    }
 
-  drawNebula()
-  drawStars(t)
+    .intro-line:first-child {
+      animation-delay: 1.42s;
+    }
 
-  // ── Main planet ──
-  const mR = Math.min(W,H) * 0.18
-  const mCx = W / 2
-  const mCy = H * 0.38 + Math.sin(t * 0.0008) * 12
+    .intro-line:last-child {
+      animation-delay: 1.82s;
+    }
 
-  drawDust(mCx, mCy, mR, mainDust, -0.15, 220)
-  drawPlanet(mCx, mCy, mR, COL_BLUE)
-  drawRingText(mCx, mCy, mR, t, mainRing, 42, 0.0003, 1.65, 0.36, -0.15, 0.46)
+    .enter-orb {
+      position: absolute;
+      z-index: 8;
+      left: 45.4%;
+      top: 56%;
+      width: var(--hub-size);
+      height: var(--hub-size);
+      border: 1px solid rgba(227, 255, 242, 0.78);
+      border-radius: 50%;
+      background: var(--mint);
+      color: #07120d;
+      font-size: clamp(1rem, 1.15vw, 1.05rem);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.45);
+      box-shadow:
+        0 0 0 0 rgba(88, 231, 171, 0),
+        0 0 28px rgba(88, 231, 171, 0.26);
+      animation:
+        enterReveal 0.82s cubic-bezier(.2, .9, .2, 1) 2.62s forwards,
+        enterBreath 3.4s ease-in-out 3.5s infinite;
+      transition:
+        color 220ms ease,
+        box-shadow 220ms ease,
+        border-color 220ms ease;
+    }
 
-  // ── Mini planets (use original base size, not scaled main planet) ──
-  const miniBase = Math.min(W,H) * 0.135
-  hitTargets = []
-  for (const m of minis) {
-    const r = miniBase * m.szM
-    const cx = W * m.px
-    const cy = H * m.py + Math.sin(t * 0.001 + m.fp) * m.fa
+    .enter-orb::before,
+    .enter-orb::after {
+      content: "";
+      position: absolute;
+      inset: -13px;
+      border: 1px solid rgba(88, 231, 171, 0.22);
+      border-radius: 50%;
+      opacity: 0.7;
+      pointer-events: none;
+    }
 
-    drawDust(cx, cy, r, m.dust, m.tilt, m.hue)
-    drawPlanet(cx, cy, r, m.col)
-    drawRingText(cx, cy, r, t, m.ring, m.hue, m.os, 2.0, 0.38, m.tilt, 0.30)
+    .enter-orb::after {
+      inset: -26px;
+      opacity: 0.3;
+    }
 
-    hitTargets.push({ cx, cy, r, href: m.href, label: m.label })
-  }
+    .enter-orb:hover,
+    .enter-orb:focus-visible {
+      outline: none;
+      border-color: #ffffff;
+      box-shadow:
+        0 0 0 7px rgba(88, 231, 171, 0.08),
+        0 0 46px rgba(88, 231, 171, 0.5);
+    }
 
-  requestAnimationFrame(frame)
-}
+    .stage.expanded .enter-orb {
+      animation: hubSettle 0.62s cubic-bezier(.2, .9, .2, 1) forwards;
+      cursor: default;
+    }
 
-requestAnimationFrame(frame)
-</script>
+    .album-link {
+      position: absolute;
+      z-index: 9;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #f4f4f0;
+      text-decoration: none;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.25);
+      transition:
+        opacity 720ms cubic-bezier(.18, .78, .18, 1),
+        filter 250ms ease,
+        text-shadow 250ms ease;
+    }
+
+    .album-link > span:not(.dysmeania-system):not(.universe-system) {
+      position: relative;
+      padding: 0.55em 0.75em;
+      font-size: clamp(0.96rem, 1.25vw, 1.18rem);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-align: center;
+      white-space: nowrap;
+      transition:
+        letter-spacing 240ms ease,
+        transform 240ms ease;
+    }
+
+    .album-link:hover > span:not(.dysmeania-system):not(.universe-system),
+    .album-link:focus-visible > span:not(.dysmeania-system):not(.universe-system) {
+      letter-spacing: 0.18em;
+      transform: scale(1.04);
+    }
+
+    .album-link:focus-visible {
+      outline: 1px solid rgba(255, 255, 255, 0.82);
+      outline-offset: 6px;
+    }
+
+    .album-link.is-ready {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #album-dysmeania {
+      overflow: visible;
+    }
+
+    .dysmeania-system {
+      position: absolute;
+      inset: 0;
+      display: block;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+      filter: blur(14px) brightness(1.62);
+      transform: scale(0.42);
+      transition:
+        opacity 900ms cubic-bezier(.18, .78, .18, 1),
+        filter 1080ms cubic-bezier(.16, .8, .16, 1),
+        transform 1120ms cubic-bezier(.16, .84, .18, 1);
+      transform-origin: center;
+      will-change: opacity, transform, filter;
+    }
+
+    #album-dysmeania.is-ready .dysmeania-system {
+      opacity: 1;
+      filter: blur(0) brightness(1);
+      transform: scale(1);
+    }
+
+    #album-dysmeania.is-ready:hover .dysmeania-system,
+    #album-dysmeania.is-ready:focus-visible .dysmeania-system {
+      filter: brightness(1.16) contrast(1.04);
+      transform: scale(1.035);
+    }
+
+    .dysmeania-core {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      top: 50%;
+      width: 68%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 1px solid rgba(226, 210, 208, 0.54);
+      border-radius: 50%;
+      background: #090102;
+      box-shadow:
+        0 0 0 5px rgba(74, 20, 21, 0.18),
+        0 0 28px rgba(124, 28, 31, 0.35),
+        inset 0 0 36px rgba(0, 0, 0, 0.86);
+      transform: translate(-50%, -50%);
+    }
+
+    .dysmeania-core img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 51% 50%;
+      opacity: 0.62;
+      filter:
+        saturate(0.56)
+        contrast(1.46)
+        brightness(0.37)
+        sepia(0.26)
+        hue-rotate(322deg);
+      transform: scale(1.55);
+    }
+
+    .dysmeania-core::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(56, 3, 7, 0.46);
+      box-shadow:
+        inset 0 0 28px rgba(0, 0, 0, 0.74),
+        inset 0 0 0 1px rgba(208, 109, 102, 0.14);
+    }
+
+    .dysmeania-title {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.42rem, 0.95vw, 0.9rem);
+      width: 64%;
+      padding: 0;
+      color: #d9d8d2;
+      font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+      font-size: clamp(0.97rem, 2.19vw, 2.07rem);
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.74),
+        0 -1px 0 rgba(46, 45, 43, 0.95),
+        0 0 11px rgba(235, 232, 222, 0.18);
+      transform: translate(-50%, -50%) scaleX(0.76) scaleY(1.32);
+      transform-origin: center;
+      white-space: nowrap;
+    }
+
+    .dysmeania-title .is-data {
+      color: rgba(216, 50, 53, 0.72);
+      text-shadow:
+        1px 0 0 rgba(255, 136, 126, 0.46),
+        -1px 0 0 rgba(85, 4, 10, 0.86),
+        0 0 8px rgba(255, 48, 54, 0.46),
+        0 0 16px rgba(130, 10, 18, 0.34);
+    }
+
+    .dysmeania-orbit {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .dysmeania-ring {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0.7;
+      mix-blend-mode: normal;
+      transform:
+        rotate(var(--orbit-angle))
+        scale(var(--orbit-scale))
+        scaleY(var(--orbit-depth));
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    .dysmeania-ring.is-back {
+      z-index: 2;
+      clip-path: inset(0 0 50% 0);
+      opacity: 0.38;
+    }
+
+    .dysmeania-ring.is-front {
+      z-index: 7;
+      clip-path: inset(50% 0 0 0);
+    }
+
+    .dysmeania-orbit-object {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: block;
+      width: var(--object-size);
+      aspect-ratio: 1;
+      padding: 0;
+      object-fit: contain;
+      opacity: 0.98;
+      mix-blend-mode: normal;
+      filter:
+        saturate(0.58)
+        contrast(1.28)
+        brightness(1.34);
+      transform: translate(-50%, -50%);
+      transform-origin: center;
+      will-change: left, top, transform;
+    }
+
+    #album-universe {
+      overflow: visible;
+      border-radius: 45% 55% 49% 51% / 52% 46% 54% 48%;
+    }
+
+    .universe-system {
+      position: absolute;
+      inset: -9%;
+      display: block;
+      padding: 0;
+      opacity: 0;
+      pointer-events: none;
+      filter: blur(14px) brightness(1.62);
+      transform: scale(0.42);
+      transform-origin: center;
+      transition:
+        opacity 900ms cubic-bezier(.18, .78, .18, 1),
+        filter 1080ms cubic-bezier(.16, .8, .16, 1),
+        transform 1120ms cubic-bezier(.16, .84, .18, 1);
+      will-change: opacity, transform, filter;
+    }
+
+    #album-universe.is-ready .universe-system {
+      opacity: 1;
+      filter: blur(0) brightness(1);
+      transform: scale(1);
+    }
+
+    #album-universe.is-ready:hover .universe-system,
+    #album-universe.is-ready:focus-visible .universe-system {
+      filter:
+        blur(0)
+        brightness(1.1)
+        saturate(1.12)
+        drop-shadow(0 0 13px rgba(74, 255, 197, 0.2));
+      transform: scale(1.035);
+    }
+
+    .universe-fluid-canvas,
+    .universe-fluid-fallback,
+    .universe-glyph {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .universe-fluid-canvas {
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    .universe-fluid-fallback {
+      z-index: 0;
+      object-fit: contain;
+      opacity: 1;
+      filter:
+        grayscale(0.22)
+        hue-rotate(10deg)
+        saturate(0.64)
+        brightness(1.08)
+        contrast(1.12);
+      transition: opacity 300ms ease;
+    }
+
+    .universe-system.is-fluid-ready .universe-fluid-canvas {
+      opacity: 1;
+    }
+
+    .universe-system.is-fluid-ready .universe-fluid-fallback {
+      opacity: 0;
+    }
+
+    .universe-glyph-field {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: block;
+      filter:
+        saturate(1.04)
+        drop-shadow(0 0 4px rgba(121, 255, 218, 0.16));
+      pointer-events: none;
+    }
+
+    .universe-glyph {
+      object-fit: contain;
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    .universe-fluid-source {
+      display: none;
+    }
+
+    .legacy-link {
+      position: absolute;
+      z-index: 10;
+      right: clamp(20px, 2.4vw, 38px);
+      top: clamp(20px, 2.6vw, 38px);
+      color: rgba(235, 235, 230, 0.48);
+      font-size: 0.72rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-decoration: none;
+      opacity: 0;
+      animation: quietLink 0.8s ease 2.1s forwards;
+      transition: color 180ms ease;
+    }
+
+    .legacy-link:hover,
+    .legacy-link:focus-visible {
+      color: rgba(235, 235, 230, 0.9);
+      outline: none;
+    }
+
+    .burst-flash {
+      position: absolute;
+      z-index: 5;
+      width: 22px;
+      height: 22px;
+      left: 45.4%;
+      top: 56%;
+      border-radius: 50%;
+      background: #f7fff9;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.1);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .stage.expanded .burst-flash {
+      animation: burstFlash 1.05s ease-out forwards;
+    }
+
+    .noscript {
+      position: absolute;
+      z-index: 20;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @keyframes titleReveal {
+      0% {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+        filter: blur(18px);
+        transform: translateX(-26px) scaleX(var(--title-scale-x));
+        text-shadow: 0 0 44px rgba(255, 255, 255, 0);
+      }
+      48% {
+        opacity: 0.92;
+        filter: blur(2px);
+        text-shadow: 0 0 44px rgba(255, 255, 255, 0.32);
+      }
+      100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+        filter: blur(0);
+        transform: translateX(0) scaleX(var(--title-scale-x));
+        text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+      }
+    }
+
+    @keyframes spectralEcho {
+      0% {
+        opacity: 0;
+        transform: translateX(-16px);
+        clip-path: inset(0 100% 0 0);
+      }
+      42% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0.44;
+        transform: translateX(0);
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    @keyframes copyReveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes enterReveal {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.42);
+        filter: blur(13px);
+      }
+      68% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.08);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes enterBreath {
+      0%,
+      100% {
+        box-shadow:
+          0 0 0 0 rgba(88, 231, 171, 0.1),
+          0 0 28px rgba(88, 231, 171, 0.25);
+      }
+      50% {
+        box-shadow:
+          0 0 0 16px rgba(88, 231, 171, 0),
+          0 0 48px rgba(88, 231, 171, 0.48);
+      }
+    }
+
+    @keyframes hubSettle {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      45% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.78);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.88);
+      }
+    }
+
+    @keyframes membraneBurst {
+      0% {
+        opacity: 0;
+        transform: scale(0.04);
+        filter: blur(28px);
+      }
+      28% {
+        opacity: 0.34;
+      }
+      74% {
+        opacity: 1;
+        transform: scale(1.045);
+        filter: blur(1px);
+      }
+      100% {
+        opacity: 0.94;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes membraneFloat {
+      0% {
+        transform:
+          translate3d(-9px, 5px, 0)
+          scaleX(1.002)
+          scaleY(0.994)
+          skewX(-0.28deg);
+        filter: brightness(0.96) contrast(1.02);
+      }
+      48% {
+        transform:
+          translate3d(3px, -7px, 0)
+          scaleX(1.017)
+          scaleY(1.008)
+          skewX(0.16deg)
+          skewY(-0.08deg);
+        filter: brightness(1.03) contrast(1.04);
+      }
+      100% {
+        transform:
+          translate3d(13px, 7px, 0)
+          scaleX(1.028)
+          scaleY(1.014)
+          skewX(0.46deg)
+          skewY(-0.18deg)
+          rotate(0.08deg);
+        filter: brightness(1) contrast(1.07);
+      }
+    }
+
+    @keyframes burstFlash {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.1);
+        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 72px 28px rgba(255, 255, 255, 0.92);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(16);
+        box-shadow: 0 0 160px 90px rgba(88, 231, 171, 0);
+      }
+    }
+
+    @keyframes quietLink {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 800px) {
+      :root {
+        --hub-size: 98px;
+      }
+
+      .identity {
+        top: 9vh;
+        left: 7vw;
+        width: 86vw;
+      }
+
+      .identity-title {
+        --title-scale-x: 0.96;
+        font-size: clamp(5.6rem, 27vw, 9.6rem);
+        margin-left: 0;
+      }
+
+      .intro {
+        margin-top: 32px;
+        font-size: clamp(0.88rem, 3.8vw, 1.02rem);
+        line-height: 1.85;
+      }
+
+      .enter-orb,
+      .burst-flash {
+        left: 50%;
+        top: 49%;
+      }
+
+      .membrane-reveal {
+        inset: 2%;
+      }
+
+      .membrane-reveal img {
+        object-fit: contain;
+        object-position: center;
+        opacity: 0.72;
+      }
+
+      .legacy-link {
+        font-size: 0.65rem;
+      }
+
+      .album-link > span:not(.dysmeania-system):not(.universe-system) {
+        font-size: 0.86rem;
+      }
+
+      .dysmeania-title {
+        gap: clamp(0.32rem, 1.68vw, 0.44rem);
+        font-size: clamp(0.73rem, 3.87vw, 1rem);
+      }
+    }
+
+    @media (max-height: 650px) and (min-width: 801px) {
+      .identity {
+        top: 8vh;
+      }
+
+      .identity-title {
+        font-size: min(14vw, 10.5rem);
+      }
+
+      .intro {
+        margin-top: 26px;
+        font-size: 0.95rem;
+        line-height: 1.7;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+      }
+
+      .identity-title,
+      .intro-line,
+      .enter-orb,
+      .legacy-link {
+        opacity: 1;
+        clip-path: none;
+        filter: none;
+      }
+
+      .album-link,
+      .dysmeania-system,
+      .universe-system {
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <div class="membrane-reveal" aria-hidden="true">
+      <img src="/images/hero-silk-membrane-v2.png" alt="">
+    </div>
+
+    <canvas id="universe-canvas" aria-hidden="true"></canvas>
+    <div class="burst-flash" aria-hidden="true"></div>
+
+    <section class="identity" aria-label="个人介绍">
+      <h1 class="identity-title" data-text="JAKE PEI" aria-label="JAKE PEI">JAKE PEI</h1>
+      <p class="intro">
+        <span class="intro-line">你好，我是裴峙丞。</span>
+        <span class="intro-line">这里是我的音乐空间。</span>
+      </p>
+    </section>
+
+    <button
+      class="enter-orb"
+      id="enter-orb"
+      type="button"
+      aria-controls="album-dysmeania album-universe"
+      aria-expanded="false"
+    >
+      进入音乐
+    </button>
+
+    <a
+      class="album-link"
+      id="album-dysmeania"
+      href="/music/"
+      aria-label="进入专辑《失义症》"
+    >
+      <span class="dysmeania-system" id="dysmeania-system" aria-hidden="true">
+        <span class="dysmeania-core">
+          <img src="/images/cover-dysmeania.jpg" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="-8"
+          data-depth="0.31"
+          data-scale="1.02"
+          data-speed="0.00009"
+          data-direction="1"
+          data-phase="0.3"
+          style="--orbit-angle: -8deg; --orbit-depth: 0.31; --orbit-scale: 1.02; --object-size: 16%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-camera.png" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="62"
+          data-depth="0.36"
+          data-scale="0.98"
+          data-speed="0.000135"
+          data-direction="-1"
+          data-phase="1.4"
+          style="--orbit-angle: 62deg; --orbit-depth: 0.36; --orbit-scale: 0.98; --object-size: 16%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-hand.png" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="-52"
+          data-depth="0.42"
+          data-scale="0.9"
+          data-speed="0.000205"
+          data-direction="1"
+          data-phase="2.1"
+          style="--orbit-angle: -52deg; --orbit-depth: 0.42; --orbit-scale: 0.9; --object-size: 13%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-gauge.png" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="29"
+          data-depth="0.54"
+          data-scale="0.83"
+          data-speed="0.00007"
+          data-direction="-1"
+          data-phase="3.4"
+          style="--orbit-angle: 29deg; --orbit-depth: 0.54; --orbit-scale: 0.83; --object-size: 15%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-warning.png" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="-23"
+          data-depth="0.65"
+          data-scale="0.76"
+          data-speed="0.000165"
+          data-direction="1"
+          data-phase="4.7"
+          style="--orbit-angle: -23deg; --orbit-depth: 0.65; --orbit-scale: 0.76; --object-size: 14%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-terminal.png" alt="">
+        </span>
+
+        <span
+          class="dysmeania-orbit"
+          data-angle="84"
+          data-depth="0.25"
+          data-scale="0.72"
+          data-speed="0.000115"
+          data-direction="-1"
+          data-phase="5.5"
+          style="--orbit-angle: 84deg; --orbit-depth: 0.25; --orbit-scale: 0.72; --object-size: 12%;"
+        >
+          <img class="dysmeania-ring is-back" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-ring is-front" src="/images/dysmeania/orbit-ring.png" alt="">
+          <img class="dysmeania-orbit-object" src="/images/dysmeania/orbit-relay.png" alt="">
+        </span>
+
+        <span class="dysmeania-title">
+          <span>失</span><span class="is-data">义</span><span>症</span>
+        </span>
+      </span>
+    </a>
+
+    <a
+      class="album-link"
+      id="album-universe"
+      href="/universe/"
+      aria-label="进入专辑《大不了宇宙》"
+    >
+      <span class="universe-system" id="universe-system" aria-hidden="true">
+        <canvas
+          class="universe-fluid-canvas"
+          id="universe-fluid-canvas"
+        ></canvas>
+        <img
+          class="universe-fluid-fallback"
+          src="/images/universe/water-cell-body.png"
+          alt=""
+        >
+        <span class="universe-glyph-field">
+          <img class="universe-glyph" data-phase="0.2" data-speed="0.79" src="/images/universe/glyph-da.png" alt="">
+          <img class="universe-glyph" data-phase="1.5" data-speed="0.66" src="/images/universe/glyph-bu.png" alt="">
+          <img class="universe-glyph" data-phase="2.8" data-speed="0.87" src="/images/universe/glyph-liao.png" alt="">
+          <img class="universe-glyph" data-phase="4.1" data-speed="0.72" src="/images/universe/glyph-yu.png" alt="">
+          <img class="universe-glyph" data-phase="5.4" data-speed="0.83" src="/images/universe/glyph-zhou.png" alt="">
+        </span>
+        <img
+          class="universe-fluid-source"
+          id="universe-fluid-source"
+          src="/images/universe/water-cell-body.png"
+          alt=""
+        >
+      </span>
+    </a>
+
+    <a class="legacy-link" href="/legacy/" aria-label="访问旧版主页">旧主页</a>
+
+    <noscript>
+      <p class="noscript">请启用 JavaScript 以进入完整的音乐世界。</p>
+    </noscript>
+  </main>
+
+  <script>
+    (() => {
+      const stage = document.getElementById("stage")
+      const canvas = document.getElementById("universe-canvas")
+      const ctx = canvas.getContext("2d", { alpha: true })
+      const enterOrb = document.getElementById("enter-orb")
+      const albumDysmeania = document.getElementById("album-dysmeania")
+      const albumUniverse = document.getElementById("album-universe")
+      const dysmeaniaSystem = document.getElementById("dysmeania-system")
+      const dysmeaniaOrbits = Array.from(
+        dysmeaniaSystem.querySelectorAll(".dysmeania-orbit")
+      )
+      const universeSystem = document.getElementById("universe-system")
+      const universeFluidCanvas = document.getElementById("universe-fluid-canvas")
+      const universeFluidSource = document.getElementById("universe-fluid-source")
+      const universeGlyphs = Array.from(
+        universeSystem.querySelectorAll(".universe-glyph")
+      )
+      const universeGlyphBodies = [
+        { baseX: 0.255, baseY: 0.492, radiusX: 0.058, radiusY: 0.072 },
+        { baseX: 0.399, baseY: 0.489, radiusX: 0.055, radiusY: 0.07 },
+        { baseX: 0.53, baseY: 0.486, radiusX: 0.05, radiusY: 0.068 },
+        { baseX: 0.654, baseY: 0.485, radiusX: 0.056, radiusY: 0.07 },
+        { baseX: 0.782, baseY: 0.485, radiusX: 0.054, radiusY: 0.069 },
+      ]
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+      let width = 0
+      let height = 0
+      let dpr = 1
+      let expanded = false
+      let expansionStartedAt = 0
+      let particles = []
+      let hoverAlbum = null
+      let universeFluid = null
+
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+      const lerp = (a, b, t) => a + (b - a) * t
+      const easeOutExpo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      const easeOutBack = t => {
+        const c1 = 1.70158
+        const c3 = c1 + 1
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2)
+      }
+
+      function resize() {
+        const rect = stage.getBoundingClientRect()
+        width = rect.width
+        height = rect.height
+        dpr = Math.min(window.devicePixelRatio || 1, 2)
+        canvas.width = Math.round(width * dpr)
+        canvas.height = Math.round(height * dpr)
+        canvas.style.width = `${width}px`
+        canvas.style.height = `${height}px`
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+        const mobile = width <= 800
+        const hubSize = mobile
+          ? clamp(Math.min(width, height) * 0.24, 86, 104)
+          : clamp(Math.min(width, height) * 0.126, 108, 138)
+        document.documentElement.style.setProperty("--hub-size", `${hubSize}px`)
+      }
+
+      function getLayout(time) {
+        const mobile = width <= 800
+        const minSide = Math.min(width, height)
+
+        const hub = {
+          x: mobile ? width * 0.5 : width * 0.454,
+          y: mobile ? height * 0.49 : height * 0.56,
+          r: mobile
+            ? clamp(minSide * 0.12, 43, 52)
+            : clamp(minSide * 0.063, 54, 69),
+        }
+
+        const blueBase = mobile
+          ? { x: width * 0.5, y: height * 0.665 }
+          : { x: width * 0.84, y: height * 0.575 }
+        const orangeBase = mobile
+          ? { x: width * 0.5, y: height * 0.855 }
+          : { x: width * 0.65, y: height * 0.82 }
+
+        const blueR = mobile
+          ? clamp(minSide * 0.142, 48, 62)
+          : clamp(minSide * 0.108, 82, 116)
+        const orangeR = mobile
+          ? clamp(minSide * 0.132, 46, 59)
+          : clamp(minSide * 0.1, 78, 108)
+
+        const driftScale = mobile ? 0.55 : 1
+        const blue = {
+          x:
+            blueBase.x +
+            (Math.sin(time * 0.00036 + 1.2) * 17 +
+              Math.sin(time * 0.00013 + 4.1) * 4.5) *
+              driftScale,
+          y:
+            blueBase.y +
+            (Math.cos(time * 0.00029 + 0.8) * 12 +
+              Math.sin(time * 0.00017 + 2.6) * 3.5) *
+              driftScale,
+          r: blueR,
+        }
+        const orange = {
+          x:
+            orangeBase.x +
+            (Math.sin(time * 0.00032 + 3.4) * 16 +
+              Math.cos(time * 0.00015 + 1.7) * 4) *
+              driftScale,
+          y:
+            orangeBase.y +
+            (Math.cos(time * 0.00027 + 2.2) * 11 +
+              Math.sin(time * 0.00014 + 5.1) * 3.5) *
+              driftScale,
+          r: orangeR,
+        }
+
+        for (const orb of [blue, orange]) {
+          const margin = orb.r + 22
+          orb.x = clamp(orb.x, margin, width - margin)
+          orb.y = clamp(orb.y, margin, height - margin)
+        }
+
+        const dysmeaniaExtent = blue.r * (mobile ? 1.38 : 1.58) + 14
+        blue.x = clamp(blue.x, dysmeaniaExtent, width - dysmeaniaExtent)
+        blue.y = clamp(blue.y, dysmeaniaExtent, height - dysmeaniaExtent)
+
+        return { mobile, hub, blue, orange }
+      }
+
+      function createExplosion(layout) {
+        const palette = [
+          [245, 255, 249],
+          [88, 231, 171],
+          [49, 95, 255],
+          [255, 109, 44],
+        ]
+
+        particles = Array.from({ length: reducedMotion ? 0 : 220 }, (_, index) => {
+          const angle = Math.random() * Math.PI * 2
+          const speed = 90 + Math.pow(Math.random(), 0.34) * 560
+          const color = palette[index % palette.length]
+          return {
+            x: layout.hub.x,
+            y: layout.hub.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            drag: 0.965 + Math.random() * 0.02,
+            life: 0.65 + Math.random() * 1.25,
+            age: 0,
+            size: 0.7 + Math.random() * 2.5,
+            color,
+          }
+        })
+      }
+
+      function createUniverseFluidRenderer() {
+        const gl = universeFluidCanvas.getContext("webgl", {
+          alpha: true,
+          antialias: true,
+          premultipliedAlpha: true,
+        })
+        if (!gl) return null
+
+        const vertexSource = `
+          attribute vec2 a_position;
+          varying vec2 v_uv;
+
+          void main() {
+            v_uv = a_position * 0.5 + 0.5;
+            gl_Position = vec4(a_position, 0.0, 1.0);
+          }
+        `
+        const fragmentSource = `
+          precision highp float;
+
+          varying vec2 v_uv;
+          uniform sampler2D u_texture;
+          uniform float u_time;
+
+          void main() {
+            vec2 p = v_uv - 0.5;
+            float radius = length(p);
+            float angle = atan(p.y, p.x);
+            vec2 radialDirection = p / max(radius, 0.001);
+
+            float membraneBand =
+              smoothstep(0.16, 0.41, radius) *
+              (1.0 - smoothstep(0.5, 0.61, radius));
+            float surfacePulse =
+              sin(angle * 3.0 + u_time * 0.52) * 0.022 +
+              sin(angle * 5.0 - u_time * 0.38 + 1.7) * 0.011 +
+              sin(angle * 2.0 + u_time * 0.26 + 4.1) * 0.0065;
+            vec2 tangentDirection =
+              vec2(-radialDirection.y, radialDirection.x);
+            float surfaceSlide =
+              sin(angle * 4.0 - u_time * 0.41 + 0.8) * 0.0048;
+
+            vec2 internalFlow = vec2(
+              sin((p.y * 5.4 + p.x * 1.6) + u_time * 0.35),
+              cos((p.x * 4.8 - p.y * 1.3) - u_time * 0.3)
+            ) * 0.005 * smoothstep(0.03, 0.52, radius);
+
+            vec2 sampleUv =
+              v_uv +
+              radialDirection * surfacePulse * membraneBand +
+              tangentDirection * surfaceSlide * membraneBand +
+              internalFlow;
+            vec4 color = texture2D(u_texture, sampleUv);
+            float causticBreath =
+              1.02 +
+              0.055 * sin(u_time * 0.55 + angle * 2.0) * membraneBand;
+
+            float luma = dot(color.rgb, vec3(0.19, 0.72, 0.09));
+            float tone = smoothstep(0.015, 0.72, luma);
+            vec3 deepTone = vec3(0.003, 0.04, 0.055);
+            vec3 clearTone = vec3(0.025, 0.64, 0.74);
+            vec3 highlightTone = vec3(0.58, 0.98, 0.96);
+            vec3 simpleTeal = mix(deepTone, clearTone, tone);
+            simpleTeal = mix(
+              simpleTeal,
+              highlightTone,
+              smoothstep(0.48, 0.96, luma)
+            );
+            color.rgb = pow(max(simpleTeal, vec3(0.0)), vec3(0.92));
+            color.rgb *= causticBreath;
+            gl_FragColor = color;
+          }
+        `
+
+        const compileShader = (type, source) => {
+          const shader = gl.createShader(type)
+          gl.shaderSource(shader, source)
+          gl.compileShader(shader)
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            gl.deleteShader(shader)
+            return null
+          }
+          return shader
+        }
+
+        const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSource)
+        const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSource)
+        if (!vertexShader || !fragmentShader) return null
+
+        const program = gl.createProgram()
+        gl.attachShader(program, vertexShader)
+        gl.attachShader(program, fragmentShader)
+        gl.linkProgram(program)
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null
+
+        const buffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+          gl.STATIC_DRAW
+        )
+
+        gl.useProgram(program)
+        const position = gl.getAttribLocation(program, "a_position")
+        gl.enableVertexAttribArray(position)
+        gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0)
+
+        const texture = gl.createTexture()
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          universeFluidSource
+        )
+
+        gl.uniform1i(gl.getUniformLocation(program, "u_texture"), 0)
+        gl.clearColor(0, 0, 0, 0)
+        universeSystem.classList.add("is-fluid-ready")
+
+        return {
+          gl,
+          program,
+          timeUniform: gl.getUniformLocation(program, "u_time"),
+          bufferWidth: 0,
+          bufferHeight: 0,
+        }
+      }
+
+      function setupUniverseFluid() {
+        if (!universeFluidSource.complete || !universeFluidSource.naturalWidth) {
+          universeFluidSource.addEventListener("load", setupUniverseFluid, {
+            once: true,
+          })
+          return
+        }
+        universeFluid = createUniverseFluidRenderer()
+      }
+
+      function renderUniverseFluid(time) {
+        if (!universeFluid) return
+
+        const { gl } = universeFluid
+        const bounds = universeFluidCanvas.getBoundingClientRect()
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+        const bufferWidth = Math.max(2, Math.round(bounds.width * pixelRatio))
+        const bufferHeight = Math.max(2, Math.round(bounds.height * pixelRatio))
+
+        if (
+          bufferWidth !== universeFluid.bufferWidth ||
+          bufferHeight !== universeFluid.bufferHeight
+        ) {
+          universeFluidCanvas.width = bufferWidth
+          universeFluidCanvas.height = bufferHeight
+          universeFluid.bufferWidth = bufferWidth
+          universeFluid.bufferHeight = bufferHeight
+          gl.viewport(0, 0, bufferWidth, bufferHeight)
+        }
+
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        gl.useProgram(universeFluid.program)
+        gl.uniform1f(
+          universeFluid.timeUniform,
+          reducedMotion ? 0 : time * 0.001
+        )
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+      }
+
+      function updateUniverseGlyphs(time) {
+        const bounds = universeSystem.getBoundingClientRect()
+        const systemWidth = bounds.width
+        const systemHeight = bounds.height
+        const seconds = reducedMotion ? 0 : time * 0.001
+        const bodies = universeGlyphs.map((glyph, index) => {
+          const phase = Number(glyph.dataset.phase)
+          const speed = Number(glyph.dataset.speed)
+          const travel = seconds * speed + phase
+          const definition = universeGlyphBodies[index]
+          const desiredX =
+            Math.sin(travel) * (4.15 + index * 0.38) +
+            Math.sin(seconds * 0.34 + phase * 1.8) * 1.55
+          const desiredY =
+            Math.cos(travel * 0.83 + phase * 0.42) *
+              (3.3 + (index % 2) * 0.62) +
+            Math.sin(seconds * 0.3 + phase) * 1.35
+
+          return {
+            glyph,
+            baseX: definition.baseX * systemWidth,
+            baseY: definition.baseY * systemHeight,
+            x: definition.baseX * systemWidth + desiredX,
+            y: definition.baseY * systemHeight + desiredY,
+            radiusX: definition.radiusX * systemWidth,
+            radiusY: definition.radiusY * systemHeight,
+            rotation:
+              Math.sin(travel * 0.61 + phase) * (0.42 + index * 0.035),
+            scale:
+              1 + Math.cos(travel * 0.52 + phase * 0.7) * 0.012,
+          }
+        })
+
+        const clampBody = body => {
+          body.x = clamp(
+            body.x,
+            systemWidth * 0.13 + body.radiusX,
+            systemWidth * 0.88 - body.radiusX
+          )
+          body.y = clamp(
+            body.y,
+            systemHeight * 0.38 + body.radiusY,
+            systemHeight * 0.61 - body.radiusY
+          )
+        }
+
+        bodies.forEach(clampBody)
+        for (let pass = 0; pass < 8; pass++) {
+          for (let leftIndex = 0; leftIndex < bodies.length; leftIndex++) {
+            for (
+              let rightIndex = leftIndex + 1;
+              rightIndex < bodies.length;
+              rightIndex++
+            ) {
+              const left = bodies[leftIndex]
+              const right = bodies[rightIndex]
+              const deltaX = right.x - left.x
+              const deltaY = right.y - left.y
+              const overlapX =
+                left.radiusX + right.radiusX - Math.abs(deltaX)
+              const overlapY =
+                left.radiusY + right.radiusY - Math.abs(deltaY)
+
+              if (overlapX <= 0 || overlapY <= 0) continue
+
+              if (overlapX < overlapY) {
+                const direction = deltaX >= 0 ? 1 : -1
+                const correction = overlapX * 0.5 + 0.04
+                left.x -= direction * correction
+                right.x += direction * correction
+              } else {
+                const direction = deltaY >= 0 ? 1 : -1
+                const correction = overlapY * 0.5 + 0.04
+                left.y -= direction * correction
+                right.y += direction * correction
+              }
+
+              clampBody(left)
+              clampBody(right)
+            }
+          }
+        }
+
+        let collisionFree = true
+        for (let leftIndex = 0; leftIndex < bodies.length; leftIndex++) {
+          for (
+            let rightIndex = leftIndex + 1;
+            rightIndex < bodies.length;
+            rightIndex++
+          ) {
+            const left = bodies[leftIndex]
+            const right = bodies[rightIndex]
+            const overlapX =
+              left.radiusX + right.radiusX - Math.abs(right.x - left.x)
+            const overlapY =
+              left.radiusY + right.radiusY - Math.abs(right.y - left.y)
+            if (overlapX > 0.01 && overlapY > 0.01) collisionFree = false
+          }
+        }
+        universeSystem.dataset.collisionFree = String(collisionFree)
+
+        bodies.forEach(body => {
+          const x = body.x - body.baseX
+          const y = body.y - body.baseY
+          const rotation =
+            reducedMotion ? 0 : body.rotation
+          const scale = reducedMotion ? 1 : body.scale
+
+          body.glyph.style.transform =
+            `translate3d(${x}px, ${y}px, 0) rotate(${rotation}deg) scale(${scale})`
+        })
+      }
+
+      function triggerExpansion() {
+        if (expanded) return
+        expanded = true
+        expansionStartedAt = performance.now()
+        stage.classList.add("expanded")
+        enterOrb.setAttribute("aria-expanded", "true")
+        enterOrb.disabled = true
+        createExplosion(getLayout(expansionStartedAt))
+
+        window.setTimeout(() => {
+          albumDysmeania.classList.add("is-ready")
+        }, reducedMotion ? 0 : 360)
+
+        window.setTimeout(() => {
+          albumUniverse.classList.add("is-ready")
+        }, reducedMotion ? 0 : 360)
+      }
+
+      function drawAmbientDust(time, progress) {
+        if (progress <= 0) return
+        ctx.save()
+        for (let i = 0; i < 34; i++) {
+          const seed = i * 91.73
+          const x = (Math.sin(seed * 1.3) * 0.5 + 0.5) * width
+          const y = (Math.cos(seed * 0.83) * 0.5 + 0.5) * height
+          const pulse = 0.25 + 0.75 * (Math.sin(time * 0.0011 + seed) * 0.5 + 0.5)
+          ctx.beginPath()
+          ctx.arc(x, y, 0.35 + (i % 3) * 0.22, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(225, 239, 235, ${0.16 * pulse * progress})`
+          ctx.fill()
+        }
+        ctx.restore()
+      }
+
+      function strokeCurve(
+        from,
+        cp1,
+        cp2,
+        to,
+        progress,
+        alpha,
+        widthValue = 0.7,
+        tone = "231, 240, 237",
+        shimmerOffset = null
+      ) {
+        ctx.save()
+        ctx.beginPath()
+        ctx.moveTo(from.x, from.y)
+        ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, to.x, to.y)
+        ctx.strokeStyle = `rgba(${tone}, ${alpha})`
+        ctx.lineWidth = widthValue
+        ctx.setLineDash([1400 * progress, 1400])
+        ctx.stroke()
+
+        if (shimmerOffset !== null && progress > 0.72) {
+          ctx.beginPath()
+          ctx.moveTo(from.x, from.y)
+          ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, to.x, to.y)
+          ctx.strokeStyle = `rgba(${tone}, ${alpha * 2.5})`
+          ctx.lineWidth = Math.max(0.36, widthValue * 0.58)
+          ctx.setLineDash([1.4, 68])
+          ctx.lineDashOffset = -shimmerOffset
+          ctx.shadowColor = `rgba(${tone}, 0.42)`
+          ctx.shadowBlur = 7
+          ctx.stroke()
+        }
+        ctx.restore()
+      }
+
+      function drawFilaments(layout, time, progress) {
+        if (progress <= 0) return
+        const { hub, blue, orange, mobile } = layout
+        const reveal = easeOutExpo(progress)
+        const shapeScale = mobile ? 0.44 : 1
+        const slowWave = time * 0.00026
+        const fastWave = time * 0.00054
+
+        for (let i = 0; i < 12; i++) {
+          const spread = (i - 5.5) * (mobile ? 2.1 : 4.3)
+          const phase = i * 0.46
+          const bendX =
+            (Math.sin(fastWave + phase) * 11 +
+              Math.cos(slowWave * 0.72 + phase * 1.3) * 5) *
+            shapeScale
+          const bendY =
+            (Math.cos(slowWave + phase) * 10 +
+              Math.sin(fastWave * 0.68 + phase * 0.8) * 4) *
+            shapeScale
+          strokeCurve(
+            { x: hub.x + spread * 0.22, y: hub.y + spread * 0.14 },
+            {
+              x: lerp(hub.x, blue.x, 0.3) + spread * 0.7 + bendX,
+              y: lerp(hub.y, blue.y, 0.22) - 62 + bendY + spread,
+            },
+            {
+              x:
+                lerp(hub.x, blue.x, 0.72) -
+                spread * 0.35 -
+                bendY * 0.62,
+              y:
+                lerp(hub.y, blue.y, 0.68) -
+                48 -
+                spread * 0.3 +
+                bendX * 0.38,
+            },
+            { x: blue.x - blue.r * 0.44, y: blue.y - spread * 0.08 },
+            reveal,
+            0.08 + (i % 3) * 0.018,
+            0.45 + (i % 2) * 0.28,
+            i % 4 === 0 ? "196, 255, 237" : "231, 240, 237",
+            i % 4 === 0 ? time * 0.018 + i * 11 : null
+          )
+        }
+
+        for (let i = 0; i < 11; i++) {
+          const spread = (i - 5) * (mobile ? 2 : 4)
+          const phase = i * 0.51 + 1.8
+          const bendX =
+            (Math.sin(fastWave * 0.84 + phase) * 10 +
+              Math.cos(slowWave + phase * 0.74) * 4.5) *
+            shapeScale
+          const bendY =
+            (Math.cos(slowWave * 0.9 + phase) * 9 +
+              Math.sin(fastWave * 0.61 + phase * 1.2) * 4) *
+            shapeScale
+          strokeCurve(
+            { x: hub.x + spread * 0.16, y: hub.y + spread * 0.1 },
+            {
+              x:
+                lerp(hub.x, orange.x, 0.28) -
+                54 +
+                spread * 0.5 +
+                bendX,
+              y: lerp(hub.y, orange.y, 0.32) + 66 + bendY,
+            },
+            {
+              x:
+                lerp(hub.x, orange.x, 0.72) +
+                spread * 0.28 -
+                bendY * 0.58,
+              y:
+                lerp(hub.y, orange.y, 0.74) -
+                30 +
+                spread +
+                bendX * 0.42,
+            },
+            { x: orange.x - orange.r * 0.45, y: orange.y + spread * 0.12 },
+            reveal,
+            0.072 + (i % 3) * 0.018,
+            0.42 + (i % 2) * 0.22,
+            i % 4 === 1 ? "210, 225, 255" : "231, 240, 237",
+            i % 4 === 1 ? time * 0.016 + i * 13 : null
+          )
+        }
+
+        for (let i = 0; i < 5; i++) {
+          const offset = (i - 2) * (mobile ? 2.4 : 6.2)
+          const weave =
+            Math.sin(fastWave * 0.72 + i * 0.9) *
+            (mobile ? 4 : 13)
+          strokeCurve(
+            {
+              x: blue.x - blue.r * 0.5,
+              y: blue.y + offset * 0.42,
+            },
+            {
+              x: lerp(blue.x, orange.x, 0.28) + weave,
+              y: lerp(blue.y, orange.y, 0.24) + offset - weave * 0.35,
+            },
+            {
+              x: lerp(blue.x, orange.x, 0.72) - weave * 0.65,
+              y: lerp(blue.y, orange.y, 0.76) - offset + weave * 0.28,
+            },
+            {
+              x: orange.x + orange.r * 0.42,
+              y: orange.y - offset * 0.34,
+            },
+            reveal,
+            0.045 + i * 0.006,
+            0.4,
+            i === 2 ? "198, 230, 255" : "231, 240, 237",
+            i === 2 ? time * 0.014 : null
+          )
+        }
+
+        const edgeTargets = mobile
+          ? [
+              { x: width * 0.04, y: height * 0.55 },
+              { x: width * 0.96, y: height * 0.48 },
+              { x: width * 0.94, y: height * 0.89 },
+            ]
+          : [
+              { x: width * 0.04, y: height * 0.79 },
+              { x: width * 0.54, y: height * 0.02 },
+              { x: width * 0.97, y: height * 0.04 },
+              { x: width * 0.98, y: height * 0.77 },
+            ]
+
+        edgeTargets.forEach((target, index) => {
+          const origin = index % 2 === 0 ? hub : blue
+          const edgePhase = slowWave + index * 1.37
+          const edgeBendX =
+            Math.sin(edgePhase) * (mobile ? 8 : 26)
+          const edgeBendY =
+            Math.cos(edgePhase * 0.83) * (mobile ? 7 : 21)
+          strokeCurve(
+            origin,
+            {
+              x: lerp(origin.x, target.x, 0.34) + edgeBendX,
+              y:
+                lerp(origin.y, target.y, 0.2) -
+                42 +
+                index * 12 +
+                edgeBendY,
+            },
+            {
+              x:
+                lerp(origin.x, target.x, 0.72) -
+                24 -
+                edgeBendY * 0.46,
+              y:
+                lerp(origin.y, target.y, 0.76) +
+                32 +
+                edgeBendX * 0.34,
+            },
+            target,
+            reveal,
+            0.17,
+            0.72,
+            index === 2 ? "192, 255, 236" : "231, 240, 237",
+            time * 0.012 + index * 17
+          )
+        })
+      }
+
+      function drawNode(x, y, radius, color, alpha) {
+        ctx.save()
+        ctx.shadowColor = color
+        ctx.shadowBlur = radius * 4
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
+        ctx.fillStyle = color
+        ctx.globalAlpha = alpha
+        ctx.fill()
+        ctx.restore()
+      }
+
+      function drawOrb(orb, color, accent, time, progress, phase, hovered) {
+        const scale = easeOutBack(progress) * (hovered ? 1.045 : 1)
+        if (scale <= 0.01) return
+
+        ctx.save()
+        ctx.translate(orb.x, orb.y)
+        ctx.scale(scale, scale)
+
+        const glow = ctx.createRadialGradient(0, 0, orb.r * 0.45, 0, 0, orb.r * 1.75)
+        glow.addColorStop(0, `${color}38`)
+        glow.addColorStop(0.58, `${color}15`)
+        glow.addColorStop(1, `${color}00`)
+        ctx.fillStyle = glow
+        ctx.fillRect(-orb.r * 2, -orb.r * 2, orb.r * 4, orb.r * 4)
+
+        for (let ring = 0; ring < 4; ring++) {
+          const wobble = Math.sin(time * 0.0012 + phase + ring) * 1.8
+          ctx.beginPath()
+          ctx.arc(0, 0, orb.r + 8 + ring * 7 + wobble, 0, Math.PI * 2)
+          ctx.strokeStyle = `${accent}${ring === 0 ? "75" : "28"}`
+          ctx.lineWidth = ring === 0 ? 1.2 : 0.65
+          ctx.stroke()
+        }
+
+        const body = ctx.createRadialGradient(
+          -orb.r * 0.28,
+          -orb.r * 0.32,
+          orb.r * 0.05,
+          0,
+          0,
+          orb.r
+        )
+        body.addColorStop(0, `${accent}96`)
+        body.addColorStop(0.24, `${color}5c`)
+        body.addColorStop(0.66, `${color}28`)
+        body.addColorStop(1, "#050707")
+
+        ctx.beginPath()
+        ctx.arc(0, 0, orb.r, 0, Math.PI * 2)
+        ctx.fillStyle = body
+        ctx.fill()
+        ctx.strokeStyle = `${accent}a8`
+        ctx.lineWidth = 1.25
+        ctx.stroke()
+
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(0, 0, orb.r * 0.83, 0, Math.PI * 2)
+        ctx.clip()
+        for (let line = 0; line < 6; line++) {
+          ctx.beginPath()
+          const amplitude = orb.r * (0.08 + line * 0.016)
+          const baseline = (line - 2.5) * orb.r * 0.055
+          for (let x = -orb.r; x <= orb.r; x += 3) {
+            const envelope = Math.max(0, 1 - Math.abs(x) / orb.r)
+            const y =
+              baseline +
+              Math.sin(x * 0.055 + time * 0.0013 + phase + line * 0.65) *
+                amplitude *
+                envelope
+            if (x === -orb.r) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+          ctx.strokeStyle = `${accent}${line === 2 ? "d8" : "64"}`
+          ctx.lineWidth = line === 2 ? 1.35 : 0.7
+          ctx.stroke()
+        }
+        ctx.restore()
+
+        ctx.restore()
+      }
+
+      function drawExplosion(delta) {
+        if (!particles.length) return
+
+        ctx.save()
+        particles = particles.filter(particle => particle.age < particle.life)
+        particles.forEach(particle => {
+          particle.age += delta
+          particle.x += particle.vx * delta
+          particle.y += particle.vy * delta
+          particle.vx *= Math.pow(particle.drag, delta * 60)
+          particle.vy *= Math.pow(particle.drag, delta * 60)
+          const life = 1 - particle.age / particle.life
+          const [r, g, b] = particle.color
+          ctx.beginPath()
+          ctx.arc(
+            particle.x,
+            particle.y,
+            particle.size * Math.max(0.15, life),
+            0,
+            Math.PI * 2
+          )
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.max(0, life)})`
+          ctx.fill()
+        })
+        ctx.restore()
+      }
+
+      function positionAlbumLink(element, orb, progress, sizeMultiplier = 2) {
+        const scale = easeOutBack(progress)
+        const size = orb.r * sizeMultiplier
+        element.style.left = `${orb.x}px`
+        element.style.top = `${orb.y}px`
+        element.style.width = `${size}px`
+        element.style.height = `${size}px`
+        element.style.transform = `translate(-50%, -50%) scale(${Math.max(0.25, scale)})`
+      }
+
+      function updateDysmeaniaSystem(time, orb, mobile) {
+        const systemSize = orb.r * (mobile ? 2.72 : 3.05)
+        const half = systemSize * 0.5
+
+        dysmeaniaOrbits.forEach(orbit => {
+          const angle = Number(orbit.dataset.angle) * Math.PI / 180
+          const depth = Number(orbit.dataset.depth)
+          const orbitScale = Number(orbit.dataset.scale)
+          const speed = Number(orbit.dataset.speed)
+          const direction = Number(orbit.dataset.direction)
+          const phase = Number(orbit.dataset.phase)
+          const object = orbit.querySelector(".dysmeania-orbit-object")
+
+          const theta = reducedMotion
+            ? phase
+            : time * speed * direction + phase
+          const radiusX = systemSize * 0.42 * orbitScale
+          const radiusY = radiusX * depth
+          const localX = Math.cos(theta) * radiusX
+          const localY = Math.sin(theta) * radiusY
+          const x = localX * Math.cos(angle) - localY * Math.sin(angle)
+          const y = localX * Math.sin(angle) + localY * Math.cos(angle)
+
+          const tangentX =
+            -Math.sin(theta) * radiusX * Math.cos(angle) -
+            Math.cos(theta) * radiusY * Math.sin(angle)
+          const tangentY =
+            -Math.sin(theta) * radiusX * Math.sin(angle) +
+            Math.cos(theta) * radiusY * Math.cos(angle)
+          const tangentAngle = Math.atan2(tangentY, tangentX) * 180 / Math.PI
+          const depthScale = 0.86 + (Math.sin(theta) * 0.5 + 0.5) * 0.2
+
+          object.style.left = `${half + x}px`
+          object.style.top = `${half + y}px`
+          object.style.zIndex = Math.sin(theta) > 0 ? "9" : "3"
+          object.style.opacity = `${0.68 + depthScale * 0.28}`
+          object.style.transform =
+            `translate(-50%, -50%) rotate(${tangentAngle}deg) scale(${depthScale})`
+        })
+      }
+
+      let lastTime = performance.now()
+
+      function frame(time) {
+        const delta = Math.min(0.033, (time - lastTime) / 1000)
+        lastTime = time
+        ctx.clearRect(0, 0, width, height)
+
+        const layout = getLayout(time)
+        const rawProgress = expanded
+          ? clamp((time - expansionStartedAt) / (reducedMotion ? 1 : 1650), 0, 1)
+          : 0
+        const lineProgress = clamp(rawProgress * 1.35, 0, 1)
+        const orbProgress = clamp((rawProgress - 0.22) / 0.78, 0, 1)
+
+        if (expanded) {
+          drawAmbientDust(time, lineProgress)
+          drawFilaments(layout, time, lineProgress)
+
+          drawNode(layout.hub.x, layout.hub.y, 4.2, "#e9fff4", 0.86)
+          drawNode(
+            lerp(layout.hub.x, layout.blue.x, 0.4),
+            lerp(layout.hub.y, layout.blue.y, 0.43),
+            4,
+            "#58e7ab",
+            0.68
+          )
+          drawNode(
+            lerp(layout.hub.x, layout.orange.x, 0.52),
+            lerp(layout.hub.y, layout.orange.y, 0.54),
+            3.7,
+            "#315fff",
+            0.68
+          )
+
+          positionAlbumLink(
+            albumDysmeania,
+            layout.blue,
+            orbProgress,
+            layout.mobile ? 2.72 : 3.05
+          )
+          updateDysmeaniaSystem(time, layout.blue, layout.mobile)
+          positionAlbumLink(
+            albumUniverse,
+            layout.orange,
+            orbProgress,
+            layout.mobile ? 2.36 : 2.34
+          )
+          renderUniverseFluid(time)
+          updateUniverseGlyphs(time)
+          drawExplosion(delta)
+        }
+
+        requestAnimationFrame(frame)
+      }
+
+      albumDysmeania.addEventListener("pointerenter", () => {
+        hoverAlbum = "blue"
+      })
+      albumDysmeania.addEventListener("pointerleave", () => {
+        hoverAlbum = null
+      })
+      albumUniverse.addEventListener("pointerenter", () => {
+        hoverAlbum = "orange"
+      })
+      albumUniverse.addEventListener("pointerleave", () => {
+        hoverAlbum = null
+      })
+
+      enterOrb.addEventListener("click", triggerExpansion)
+      window.addEventListener("resize", resize, { passive: true })
+
+      setupUniverseFluid()
+      resize()
+      requestAnimationFrame(frame)
+    })()
+  </script>
 </body>
 </html>

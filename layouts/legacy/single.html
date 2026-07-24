@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<!-- 旧版主页归档：原始视觉与交互保留于 /legacy/ -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jake Pei | 裴峙丞的个人主页</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;600;700&family=ZCOOL+XiaoWei&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #05080f;
+    color: #e0ddd5;
+  }
+
+  canvas#cosmos {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 20px 36px;
+    background: linear-gradient(to bottom, rgba(5,8,15,0.8), transparent);
+    pointer-events: none;
+  }
+  nav .logo {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #c8c4ba;
+    letter-spacing: 0.04em;
+    pointer-events: auto;
+  }
+
+  .subtitle-area {
+    position: fixed;
+    z-index: 50;
+    left: 50%;
+    top: 64%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeInUp 1.8s ease 1.2s forwards;
+  }
+  .subtitle-area .tagline {
+    font-family: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    color: rgba(200, 196, 186, 0.75);
+    letter-spacing: 0.15em;
+    line-height: 2;
+    text-shadow: 0 0 30px rgba(100, 140, 220, 0.15);
+  }
+  .subtitle-area .tagline .accent { color: #f0c866; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  #tooltip {
+    position: fixed;
+    z-index: 200;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.82rem;
+    color: rgba(230,226,218,0.92);
+    background: rgba(12,15,28,0.88);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    padding: 6px 16px;
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  #tooltip.visible { opacity: 1; }
+
+  .footer {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.7rem;
+    color: rgba(200,196,186,0.25);
+    letter-spacing: 0.05em;
+    pointer-events: auto;
+    white-space: nowrap;
+  }
+  .footer a {
+    color: rgba(200,196,186,0.35);
+    text-decoration: none;
+  }
+  .footer a:hover { color: rgba(240,200,102,0.6); }
+</style>
+</head>
+<body>
+
+<canvas id="cosmos"></canvas>
+<div id="tooltip"></div>
+
+<nav><div class="logo">Jake Pei | 裴峙丞</div></nav>
+
+<div class="subtitle-area">
+  <div class="tagline">
+    用代码解析和弦，令算法谱写旋律。<br>
+    <span class="accent">Music</span> × <span class="accent">Data</span> × <span class="accent">Machine Learning</span>
+  </div>
+</div>
+
+<div class="footer">
+  © 2026 <a href="#">Jake Pei|裴峙丞的个人主页</a> · Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> & <a href="https://github.com/adityatelange/hugo-PaperMod" target="_blank">PaperMod</a>
+</div>
+
+<script>
+const canvas = document.getElementById('cosmos')
+const ctx = canvas.getContext('2d')
+const tooltip = document.getElementById('tooltip')
+const dpr = window.devicePixelRatio || 1
+let W, H
+
+function resize() {
+  W = window.innerWidth; H = window.innerHeight
+  canvas.width = W * dpr; canvas.height = H * dpr
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+}
+resize()
+window.addEventListener('resize', resize)
+
+// ── Stars ───────────────────────────────────────────
+const stars = Array.from({ length: 300 }, () => ({
+  x: Math.random(), y: Math.random(),
+  r: Math.random() * 1.5 + 0.3,
+  ts: Math.random() * 0.02 + 0.005,
+  tp: Math.random() * Math.PI * 2,
+  hue: Math.random() > 0.7 ? 40 + Math.random() * 20 : 210 + Math.random() * 40,
+}))
+function drawStars(t) {
+  for (const s of stars) {
+    const a = 0.3 + 0.5 * (0.5 + 0.5 * Math.sin(t * s.ts + s.tp))
+    ctx.beginPath()
+    ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2)
+    ctx.fillStyle = `hsla(${s.hue},60%,82%,${a})`
+    ctx.fill()
+  }
+}
+
+function drawNebula() {
+  const g1 = ctx.createRadialGradient(W*0.3,H*0.25,0,W*0.3,H*0.25,W*0.6)
+  g1.addColorStop(0,'rgba(25,35,80,0.12)'); g1.addColorStop(1,'transparent')
+  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H)
+  const g2 = ctx.createRadialGradient(W*0.75,H*0.7,0,W*0.75,H*0.7,W*0.45)
+  g2.addColorStop(0,'rgba(60,30,80,0.08)'); g2.addColorStop(1,'transparent')
+  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H)
+}
+
+// ── Generic planet ──────────────────────────────────
+function drawPlanet(cx, cy, r, c) {
+  // Atmosphere glow
+  const at = ctx.createRadialGradient(cx,cy,r*0.85,cx,cy,r*2.5)
+  at.addColorStop(0, c.glow1); at.addColorStop(0.4, c.glow2); at.addColorStop(1,'transparent')
+  ctx.fillStyle = at; ctx.fillRect(cx-r*3,cy-r*3,r*6,r*6)
+
+  ctx.save()
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip()
+  // Body
+  const bg = ctx.createRadialGradient(cx-r*0.3,cy-r*0.3,0,cx,cy,r)
+  bg.addColorStop(0,c.hi); bg.addColorStop(0.5,c.mid); bg.addColorStop(1,c.lo)
+  ctx.fillStyle = bg; ctx.fill()
+  // Bands
+  ctx.globalAlpha = 0.18
+  for (let i = 0; i < 4; i++) {
+    const by = cy-r+(r*2*(i+0.5))/4, bh = r*0.14
+    const gr = ctx.createLinearGradient(cx-r,by,cx+r,by)
+    gr.addColorStop(0,'transparent'); gr.addColorStop(0.3,c.band1); gr.addColorStop(0.7,c.band2); gr.addColorStop(1,'transparent')
+    ctx.fillStyle = gr; ctx.fillRect(cx-r,by-bh/2,r*2,bh)
+  }
+  ctx.globalAlpha = 1
+  // Specular
+  const sp = ctx.createRadialGradient(cx-r*0.35,cy-r*0.35,0,cx-r*0.35,cy-r*0.35,r*0.7)
+  sp.addColorStop(0,'rgba(255,255,255,0.30)'); sp.addColorStop(0.5,'rgba(255,255,255,0.08)'); sp.addColorStop(1,'transparent')
+  ctx.fillStyle = sp; ctx.fillRect(cx-r,cy-r,r*2,r*2)
+  ctx.restore()
+  // Rim
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2)
+  ctx.strokeStyle = c.rim; ctx.lineWidth = 1.2; ctx.stroke()
+}
+
+// Planet color presets
+const COL_BLUE = {
+  hi:'#5a8cd2', mid:'#325aa0', lo:'#142858',
+  glow1:'rgba(100,160,240,0.14)', glow2:'rgba(80,130,210,0.06)',
+  band1:'rgba(130,185,245,0.35)', band2:'rgba(80,140,200,0.20)',
+  rim:'rgba(130,190,255,0.22)'
+}
+const COL_GOLD = {
+  hi:'#d2aa46', mid:'#a07828', lo:'#5a4114',
+  glow1:'rgba(210,170,70,0.14)', glow2:'rgba(180,140,50,0.06)',
+  band1:'rgba(230,190,90,0.35)', band2:'rgba(180,140,60,0.20)',
+  rim:'rgba(240,200,100,0.22)'
+}
+const COL_GREEN = {
+  hi:'#50be82', mid:'#288250', lo:'#0f4628',
+  glow1:'rgba(80,190,130,0.14)', glow2:'rgba(60,150,100,0.06)',
+  band1:'rgba(100,210,150,0.35)', band2:'rgba(60,160,100,0.20)',
+  rim:'rgba(100,220,150,0.22)'
+}
+const COL_ROSE = {
+  hi:'#d26e96', mid:'#a03c64', lo:'#5a1e37',
+  glow1:'rgba(210,110,150,0.14)', glow2:'rgba(180,80,120,0.06)',
+  band1:'rgba(230,140,170,0.35)', band2:'rgba(180,90,130,0.20)',
+  rim:'rgba(240,140,180,0.22)'
+}
+
+// ── Ring text renderer ──────────────────────────────
+function drawRingText(cx, cy, pR, t, chars, hue, speed, aMul, bMul, tilt, fsMul) {
+  const a = pR * aMul, b = pR * bMul
+  const fs = Math.max(13, Math.min(30, pR * fsMul))
+
+  ctx.save()
+  ctx.translate(cx, cy)
+  ctx.rotate(tilt)
+
+  for (let i = 0; i < chars.length; i++) {
+    const ang = (i / chars.length) * Math.PI * 2 + t * speed
+    const x = a * Math.cos(ang), y = b * Math.sin(ang)
+    const depth = Math.sin(ang)
+    const sc = 0.6 + 0.4 * (0.5 + 0.5 * depth)
+    const al = depth > -0.1 ? (0.45 + 0.55 * depth) : 0.06
+
+    if (Math.sqrt(x*x+y*y) < pR * 0.92 && depth < 0) continue
+    const ch = chars[i]
+    if (ch === '　') continue
+
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.scale(sc, sc * 1.85) // vertical stretch
+
+    ctx.font = `300 ${fs}px "Noto Serif SC", serif`
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+
+    if (depth > 0.3) {
+      ctx.shadowColor = `hsla(${hue},70%,75%,0.45)`; ctx.shadowBlur = 14
+    } else {
+      ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0
+    }
+
+    ctx.fillStyle = depth > 0
+      ? `hsla(${hue},65%,${62+depth*22}%,${al})`
+      : `hsla(${hue},25%,60%,${al})`
+    ctx.fillText(ch === '·' ? '✦' : ch, 0, 0)
+    ctx.restore()
+  }
+
+  ctx.beginPath()
+  ctx.ellipse(0,0,a,b,0,0,Math.PI*2)
+  ctx.strokeStyle = `hsla(${hue},40%,60%,0.06)`
+  ctx.lineWidth = 0.5; ctx.stroke()
+  ctx.restore()
+}
+
+// ── Dust ────────────────────────────────────────────
+function mkDust(n) {
+  return Array.from({length:n},()=>({
+    a: Math.random()*Math.PI*2,
+    s: (Math.random()*0.0004+0.0001)*(Math.random()>0.5?1:-1),
+    rM: 2+Math.random()*1.2, bM: 0.4+Math.random()*0.3,
+    sz: Math.random()*1.5+0.5, al: Math.random()*0.3+0.1,
+  }))
+}
+function drawDust(cx,cy,pR,dust,tilt,hue) {
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(tilt)
+  for (const d of dust) {
+    d.a += d.s
+    const a2=pR*d.rM, b2=pR*d.bM
+    const x=a2*Math.cos(d.a), y=b2*Math.sin(d.a), dp=Math.sin(d.a)
+    if (dp<-0.2 && Math.sqrt(x*x+y*y)<pR*0.9) continue
+    ctx.beginPath(); ctx.arc(x,y,d.sz,0,Math.PI*2)
+    ctx.fillStyle = `hsla(${hue},50%,80%,${d.al*(0.5+0.5*dp)})`
+    ctx.fill()
+  }
+  ctx.restore()
+}
+
+// ── Build ring chars (reversed) ─────────────────────
+function ringChars(text) {
+  const c = [...text].reverse()
+  return [...c, ...'·', ...c, ...'·']
+}
+
+// ══════════════════════════════════════════════════════
+// SCENE DATA
+// ══════════════════════════════════════════════════════
+const mainRing = (function() {
+  const c = [...'你好！我是裴峙丞！'].reverse()
+  return [...c, ...'·', ...c, ...'·']
+})()
+const mainDust = mkDust(40)
+
+const minis = [
+  {
+    label:'恣意的音乐空间', href:'/music/',
+    ring: ringChars('恣意的音乐空间'),
+    col: COL_GOLD, hue: 42, dust: mkDust(15),
+    px:0.15, py:0.30, szM:0.48, fp:0, fa:8,
+    os:0.0004, tilt:-0.2,
+  },
+  {
+    label:'机器学习实验室', href:'/ml/',
+    ring: ringChars('机器学习实验室'),
+    col: COL_GREEN, hue: 150, dust: mkDust(15),
+    px:0.84, py:0.26, szM:0.42, fp:2.1, fa:10,
+    os:-0.00035, tilt:0.18,
+  },
+  {
+    label:'创意持续在冒泡', href:'/creative/',
+    ring: ringChars('创意持续在冒泡'),
+    col: COL_ROSE, hue: 340, dust: mkDust(15),
+    px:0.80, py:0.72, szM:0.40, fp:4.2, fa:9,
+    os:0.00038, tilt:-0.12,
+  },
+]
+
+// ── Hit testing ─────────────────────────────────────
+let hitTargets = []
+
+canvas.addEventListener('mousemove', e => {
+  let hit = null
+  for (const p of hitTargets) {
+    const dx=e.clientX-p.cx, dy=e.clientY-p.cy
+    if (dx*dx+dy*dy < (p.r+12)**2) { hit = p; break }
+  }
+  if (hit) {
+    canvas.style.cursor = 'pointer'
+    tooltip.textContent = hit.label
+    tooltip.style.left = (hit.cx + hit.r + 14) + 'px'
+    tooltip.style.top = (hit.cy - 16) + 'px'
+    tooltip.classList.add('visible')
+  } else {
+    canvas.style.cursor = 'default'
+    tooltip.classList.remove('visible')
+  }
+})
+
+canvas.addEventListener('click', e => {
+  for (const p of hitTargets) {
+    const dx=e.clientX-p.cx, dy=e.clientY-p.cy
+    if (dx*dx+dy*dy < (p.r+12)**2) { window.location.href = p.href; break }
+  }
+})
+
+canvas.addEventListener('touchstart', e => {
+  const t = e.touches[0]
+  for (const p of hitTargets) {
+    const dx=t.clientX-p.cx, dy=t.clientY-p.cy
+    if (dx*dx+dy*dy < (p.r+15)**2) { window.location.href = p.href; break }
+  }
+}, {passive:true})
+
+// ══════════════════════════════════════════════════════
+// RENDER LOOP
+// ══════════════════════════════════════════════════════
+let t0 = null
+
+function frame(ts) {
+  if (!t0) t0 = ts
+  const t = ts - t0
+
+  ctx.clearRect(0,0,W,H)
+
+  // Background
+  const bg = ctx.createLinearGradient(0,0,0,H)
+  bg.addColorStop(0,'#050810'); bg.addColorStop(0.4,'#080d1a')
+  bg.addColorStop(0.7,'#0a0f20'); bg.addColorStop(1,'#060a14')
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H)
+
+  drawNebula()
+  drawStars(t)
+
+  // ── Main planet ──
+  const mR = Math.min(W,H) * 0.18
+  const mCx = W / 2
+  const mCy = H * 0.38 + Math.sin(t * 0.0008) * 12
+
+  drawDust(mCx, mCy, mR, mainDust, -0.15, 220)
+  drawPlanet(mCx, mCy, mR, COL_BLUE)
+  drawRingText(mCx, mCy, mR, t, mainRing, 42, 0.0003, 1.65, 0.36, -0.15, 0.46)
+
+  // ── Mini planets (use original base size, not scaled main planet) ──
+  const miniBase = Math.min(W,H) * 0.135
+  hitTargets = []
+  for (const m of minis) {
+    const r = miniBase * m.szM
+    const cx = W * m.px
+    const cy = H * m.py + Math.sin(t * 0.001 + m.fp) * m.fa
+
+    drawDust(cx, cy, r, m.dust, m.tilt, m.hue)
+    drawPlanet(cx, cy, r, m.col)
+    drawRingText(cx, cy, r, t, m.ring, m.hue, m.os, 2.0, 0.38, m.tilt, 0.30)
+
+    hitTargets.push({ cx, cy, r, href: m.href, label: m.label })
+  }
+
+  requestAnimationFrame(frame)
+}
+
+requestAnimationFrame(frame)
+</script>
+</body>
+</html>

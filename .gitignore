@@ -1,0 +1,31 @@
+# Hugo build output
+/public/
+/resources/_gen/
+/.hugo_build.lock
+
+# Local preview logs
+/.hugo-server.*.log
+
+# Design exploration and QA artifacts
+/design-reference/
+/design-qa.md
+/design-qa-comparison*.png
+/implementation-*
+/current-universe-reference.png
+
+# Local asset-generation helpers and caches
+/scripts/
+__pycache__/
+*.py[cod]
+
+# Superseded local asset iterations
+/static/images/hero-silk-membrane.png
+/static/images/dysmeania/orbit-ring-source.png
+/static/images/universe/*-tight.png
+/static/images/universe/microscope-field-v2.webp
+/static/images/universe/organelle-*.png
+/static/images/universe/water-cell-orb.png
+
+# OS metadata
+.DS_Store
+Thumbs.db

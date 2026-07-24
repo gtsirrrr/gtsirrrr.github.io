@@ -1,0 +1,86 @@
+{
+  "width": 1487,
+  "height": 1058,
+  "background": "/images/universe/static-layers/paper-background.png",
+  "layers": {
+    "microscope-atmosphere": {
+      "file": "/images/universe/static-layers/microscope-atmosphere.png",
+      "left": 330,
+      "top": 0,
+      "width": 1157,
+      "height": 1058
+    },
+    "cell": {
+      "file": "/images/universe/static-layers/cell.png",
+      "left": 330,
+      "top": 0,
+      "width": 1157,
+      "height": 1058
+    },
+    "glyph-da": {
+      "file": "/images/universe/static-layers/glyph-da.png",
+      "left": 56,
+      "top": 126,
+      "width": 163,
+      "height": 136,
+      "alpha_bounds": [
+        45,
+        15,
+        163,
+        136
+      ]
+    },
+    "glyph-bu": {
+      "file": "/images/universe/static-layers/glyph-bu.png",
+      "left": 54,
+      "top": 250,
+      "width": 166,
+      "height": 128,
+      "alpha_bounds": [
+        26,
+        0,
+        165,
+        120
+      ]
+    },
+    "glyph-liao": {
+      "file": "/images/universe/static-layers/glyph-liao.png",
+      "left": 51,
+      "top": 363,
+      "width": 169,
+      "height": 134,
+      "alpha_bounds": [
+        57,
+        0,
+        141,
+        134
+      ]
+    },
+    "glyph-yu": {
+      "file": "/images/universe/static-layers/glyph-yu.png",
+      "left": 47,
+      "top": 482,
+      "width": 175,
+      "height": 138,
+      "alpha_bounds": [
+        53,
+        0,
+        149,
+        138
+      ]
+    },
+    "glyph-zhou": {
+      "file": "/images/universe/static-layers/glyph-zhou.png",
+      "left": 43,
+      "top": 603,
+      "width": 186,
+      "height": 135,
+      "alpha_bounds": [
+        55,
+        0,
+        186,
+        131
+      ]
+    }
+  }
+}

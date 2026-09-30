@@ -1971,7 +1971,7 @@
           drawExplosion(delta)
         }
 
-        animationFrame = expanded && !document.hidden && !reducedMotion
+        animationFrame = !document.hidden
           ? requestAnimationFrame(frame)
           : 0
       }
@@ -1995,13 +1995,14 @@
         if (document.hidden) {
           cancelAnimationFrame(animationFrame)
           animationFrame = 0
-        } else if (expanded && !reducedMotion && !animationFrame) {
+        } else if (!animationFrame) {
           lastTime = performance.now()
           animationFrame = requestAnimationFrame(frame)
         }
       })
 
       resize()
+      animationFrame = requestAnimationFrame(frame)
       if ("requestIdleCallback" in window) {
         window.requestIdleCallback(preloadMembraneImage, { timeout: 2500 })
       } else {

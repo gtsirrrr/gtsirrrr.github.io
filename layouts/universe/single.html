@@ -27,6 +27,8 @@
 
     body {
       min-height: 100svh;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: grid;
       place-items: center;
       overflow: hidden;
@@ -36,6 +38,8 @@
       position: relative;
       width: 100vw;
       height: 100svh;
+      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       background: var(--microscope-white);
       isolation: isolate;
@@ -498,19 +502,28 @@
   <main class="universe-frame" aria-label="专辑《大不了宇宙》">
     <img
       class="visual-layer paper-field"
-      src="/images/universe/static-layers/paper-background.png"
+      src="/images/universe/static-layers/paper-background.webp"
       alt=""
+      width="1440"
+      height="1025"
+      decoding="async"
     >
     <div class="cell-stage" aria-label="曲目节点">
       <img
         class="visual-layer microscope-atmosphere"
-        src="/images/universe/static-layers/microscope-atmosphere.png"
+        src="/images/universe/static-layers/microscope-atmosphere.webp"
         alt=""
+        width="1157"
+        height="1058"
+        decoding="async"
       >
       <img
         class="cell-source"
-        src="/images/universe/static-layers/cell.png"
+        src="/images/universe/static-layers/cell.webp"
         alt=""
+        width="1157"
+        height="1058"
+        decoding="async"
       >
       <canvas class="cell-canvas"></canvas>
 
@@ -544,11 +557,11 @@
     ></section>
 
     <h1 class="album-title" aria-label="大不了宇宙">
-      <img class="title-glyph glyph-da" src="/images/universe/static-layers/glyph-da.png" alt="">
-      <img class="title-glyph glyph-bu" src="/images/universe/static-layers/glyph-bu.png" alt="">
-      <img class="title-glyph glyph-liao" src="/images/universe/static-layers/glyph-liao.png" alt="">
-      <img class="title-glyph glyph-yu" src="/images/universe/static-layers/glyph-yu.png" alt="">
-      <img class="title-glyph glyph-zhou" src="/images/universe/static-layers/glyph-zhou.png" alt="">
+      <img class="title-glyph glyph-da" src="/images/universe/static-layers/glyph-da.webp" alt="" width="163" height="136" decoding="async">
+      <img class="title-glyph glyph-bu" src="/images/universe/static-layers/glyph-bu.webp" alt="" width="166" height="128" decoding="async">
+      <img class="title-glyph glyph-liao" src="/images/universe/static-layers/glyph-liao.webp" alt="" width="169" height="134" decoding="async">
+      <img class="title-glyph glyph-yu" src="/images/universe/static-layers/glyph-yu.webp" alt="" width="175" height="138" decoding="async">
+      <img class="title-glyph glyph-zhou" src="/images/universe/static-layers/glyph-zhou.webp" alt="" width="186" height="135" decoding="async">
     </h1>
 
   </main>
@@ -564,6 +577,13 @@
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches
+      const connection =
+        navigator.connection || navigator.mozConnection || navigator.webkitConnection
+      const skipFluid =
+        reducedMotion ||
+        window.matchMedia("(max-width: 800px)").matches ||
+        navigator.hardwareConcurrency <= 4 ||
+        Boolean(connection && connection.saveData)
 
       if (!frame || !stage || !source || !canvas) return
 
@@ -903,10 +923,12 @@
         requestAnimationFrame(draw)
       }
 
-      if (source.complete && source.naturalWidth) {
-        setup()
-      } else {
-        source.addEventListener("load", setup, { once: true })
+      if (!skipFluid) {
+        if (source.complete && source.naturalWidth) {
+          setup()
+        } else {
+          source.addEventListener("load", setup, { once: true })
+        }
       }
     })()
   </script>
